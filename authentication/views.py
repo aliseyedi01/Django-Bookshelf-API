@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 # apps
-from .serializers import UserSerializer
+from .serializers import UserSerializer , ResendOtpSerializer
 from .models import OtpToken,User
 # swagger
 from drf_yasg.utils import swagger_auto_schema
@@ -35,7 +35,6 @@ class SignUpView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             # Generate and send OTP
-            # user = serializer.validated_data['email']
             otp = OtpToken.objects.create(user=user, expires_at=timezone.now() + timezone.timedelta(minutes=5))
             message = f"""
                 Hi {user}, here is your OTP {otp.otp_code}
@@ -87,3 +86,32 @@ class VerifyEmailView(APIView):
         # login(request, authenticate(username=username, password=user.password))
 
         return Response({'Message': 'Your account has been activated successfully!'} ,status=status.HTTP_200_OK)
+
+
+class ResendOtpView(APIView):
+    def post(self, request):
+        serializer = ResendOtpSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        user_email = request.data["email"]
+        user = User.objects.get(email=user_email)
+        otp = OtpToken.objects.create(user=user, expires_at=timezone.now() + timezone.timedelta(minutes=5))
+
+        message = f"""
+            Hi {user.username}, here is your OTP {otp.otp_code}
+            It expires in 5 minutes, use the url below to redirect back to the website
+            http://127.0.0.1:8000/verify-email/{user.username}
+        """
+        try:
+            send_mail(
+                subject="Email Verification",
+                message=message,
+                from_email="aliotptest@gmail.com",
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+            return Response({'Message': 'A new OTP has been sent to your email address'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            otp.delete()
+            return Response({'error': f"Email sending failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

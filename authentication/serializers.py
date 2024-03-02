@@ -65,3 +65,14 @@ class UserSerializer(serializers.ModelSerializer):
         if len(value) > MAX_NAME_LENGTH:
             raise serializers.ValidationError(f"Last name cannot exceed {MAX_NAME_LENGTH} characters.")
         return value
+
+
+class ResendOtpSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+    def validate_email(self, value):
+        try:
+            User.objects.get(email=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError(f'User with this {value} does not exist')
+        return value
