@@ -73,18 +73,9 @@ class VerifyEmailView(APIView):
             },
         ),
         responses={
-            200: openapi.Response(
-                description="Account activated successfully!",
-                schema=None,  # No response schema as no data is returned
-            ),
-            400: openapi.Response(
-                description="Bad request (e.g., invalid OTP code, expired OTP)",
-                schema=None,
-            ),
-            404: openapi.Response(
-                description="User with the provided username not found",
-                schema=None,
-            ),
+            200:"Account activated successfully!",
+            400: "Bad request (e.g., invalid OTP code, expired OTP)",
+            404: "User with the provided username not found",
         }
     )
     def post(self, request, username):
