@@ -101,6 +101,7 @@ class VerifyEmailView(APIView):
             user_otp.delete()
             return Response({'error': 'OTP has expired. Please request a new one.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        user.is_verified = True
         user.save()
         user_otp.delete()
 
@@ -171,7 +172,9 @@ class SignInView(APIView):
             if not user.check_password(password):
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-            # return Response({'message' : 'Successfully signed in'}, status=status.HTTP_200_OK)
+            if not user.is_verified:
+                return Response({'error': 'Please verify your email address before signing in.'}, status=status.HTTP_401_UNAUTHORIZED)
+
 
             # Generate JWT tokens upon successful authentication
             access_token = str(AccessToken.for_user(user))
