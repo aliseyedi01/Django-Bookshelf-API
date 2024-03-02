@@ -26,8 +26,11 @@ class SignUpView(APIView):
     @swagger_auto_schema(
         request_body=UserSerializer,
         responses={
-            201:UserSerializer(many=True),
-            400: 'Bad request (e.g., invalid data, missing required fields)',
+            201: openapi.Response(
+                description="Account created successfully!",
+                schema=UserSerializer(many=True),
+            ),
+            400: "Bad request (e.g., invalid data, missing required fields)",
         }
     )
     def post(self, request):
@@ -59,7 +62,31 @@ class SignUpView(APIView):
 
 
 class VerifyEmailView(APIView):
-
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type='object',
+            properties={
+                'otp_code': openapi.Schema(
+                    type='string',
+                    description='The OTP code sent to the user\'s email.',
+                ),
+            },
+        ),
+        responses={
+            200: openapi.Response(
+                description="Account activated successfully!",
+                schema=None,  # No response schema as no data is returned
+            ),
+            400: openapi.Response(
+                description="Bad request (e.g., invalid OTP code, expired OTP)",
+                schema=None,
+            ),
+            404: openapi.Response(
+                description="User with the provided username not found",
+                schema=None,
+            ),
+        }
+    )
     def post(self, request, username):
         try:
             user = User.objects.get(username=username)
@@ -89,6 +116,18 @@ class VerifyEmailView(APIView):
 
 
 class ResendOtpView(APIView):
+    @swagger_auto_schema(
+        request_body=ResendOtpSerializer,
+        responses={
+            200: openapi.Response(
+                description="A new OTP has been sent to your email address.",
+                schema=None,
+            ),
+            400: "Bad request (e.g., invalid data, missing required fields)",
+            404: "User with the provided email not found",
+            500: "Internal server error (e.g., email sending failure)",
+        }
+    )
     def post(self, request):
         serializer = ResendOtpSerializer(data=request.data)
         if not serializer.is_valid():
