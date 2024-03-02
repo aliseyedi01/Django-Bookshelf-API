@@ -12,7 +12,7 @@ import re
 
 MAX_NAME_LENGTH = 30
 
-class UserSerializer(serializers.ModelSerializer):
+class SingUpSerializer(serializers.ModelSerializer):
 
     first_name = serializers.CharField(max_length=MAX_NAME_LENGTH, required=True)
     last_name = serializers.CharField(max_length=MAX_NAME_LENGTH, required=True)
@@ -42,7 +42,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_password(self, value):
         MIN_LENGTH = 6
-        password_regex = r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)"  # Regex for password complexity
+        password_regex = r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)"
 
         if len(value) < MIN_LENGTH:
             raise serializers.ValidationError(f"Password must be at least {MIN_LENGTH} characters long")
@@ -56,7 +56,6 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Password must include at least one uppercase letter, lowercase letter, number, and symbol"
             )
-
         return value
 
     def validate_first_name(self, value):
@@ -86,23 +85,15 @@ class SingInSerializer(serializers.ModelSerializer):
         username_or_email = data.get("username_or_email")
         password = data.get("password")
 
-        # Check if username or email is provided
         if not username_or_email:
             raise serializers.ValidationError("Username or email is required.")
 
-        # Attempt to authenticate using both username and email
         user = User.objects.filter(
             Q(username__iexact=username_or_email) | Q(email__iexact=username_or_email)
         ).first()
 
-        if user is None:
-            raise serializers.ValidationError("Invalid credentials555.")
-
-        if not user.check_password(password):
-            raise serializers.ValidationError("Invalid password.")
-
-        # if user is None or not user.check_password(password):
-        #     return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        if not user or not user.check_password(password):
+            raise serializers.ValidationError("Invalid credentials.")
 
         return data
 

@@ -17,7 +17,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 # apps
-from .serializers import UserSerializer , ResendOtpSerializer , SingInSerializer
+from .serializers import SingUpSerializer , ResendOtpSerializer , SingInSerializer
 from .models import OtpToken,User
 # swagger
 from drf_yasg.utils import swagger_auto_schema
@@ -28,17 +28,17 @@ from drf_yasg import openapi
 class SignUpView(APIView):
     permission_classes = [AllowAny]
     @swagger_auto_schema(
-        request_body=UserSerializer,
+        request_body=SingUpSerializer,
         responses={
             201: openapi.Response(
                 description="Account created successfully!",
-                schema=UserSerializer(many=True),
+                schema=SingUpSerializer(many=True),
             ),
             400: "Bad request (e.g., invalid data, missing required fields)",
         }
     )
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = SingUpSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             # Generate and send OTP
@@ -112,10 +112,7 @@ class ResendOtpView(APIView):
     @swagger_auto_schema(
         request_body=ResendOtpSerializer,
         responses={
-            200: openapi.Response(
-                description="A new OTP has been sent to your email address.",
-                schema=None,
-            ),
+            200: "A new OTP has been sent to your email address.",
             400: "Bad request (e.g., invalid data, missing required fields)",
             404: "User with the provided email not found",
             500: "Internal server error (e.g., email sending failure)",
@@ -158,6 +155,7 @@ class SignInView(APIView):
             200: "Successfully signed in",
             400: "Bad request (e.g., invalid data, missing required fields)",
             401: "Unauthorized (e.g., incorrect credentials)",
+            403: "Forbidden (e.g., user not verified)"
         }
     )
     def post(self, request):
@@ -167,14 +165,12 @@ class SignInView(APIView):
             password = serializer.validated_data['password']
 
             user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
-            if not user:
-                return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-            if not user.check_password(password):
+
+            if not user or not user.check_password(password):
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
             if not user.is_verified:
-                return Response({'error': 'Please verify your email address before signing in.'}, status=status.HTTP_401_UNAUTHORIZED)
-
+                return Response({'error': 'Please verify your email address before signing in.'}, status=status.HTTP_403_FORBIDDEN)
 
             # Generate JWT tokens upon successful authentication
             access_token = str(AccessToken.for_user(user))
