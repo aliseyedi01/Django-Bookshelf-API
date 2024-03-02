@@ -1,7 +1,8 @@
-from django.db import models
 import uuid
 import secrets
-
+# django
+from django.db import models
+from django.contrib.auth.hashers import check_password
 
 class User(models.Model):
     uuid = models.UUIDField(editable=False, primary_key=True, default=uuid.uuid4)
@@ -14,6 +15,9 @@ class User(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+    def check_password(self, password):
+        return check_password(password, self.password)
 
 class OtpToken(models.Model):
     uuid = models.UUIDField(editable=False, primary_key=True, default=uuid.uuid4)

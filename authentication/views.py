@@ -7,13 +7,16 @@ from django.core.mail import send_mail
 from django.contrib.messages import success, warning
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.timezone import now
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.db.models import Q
 # drf
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 # apps
-from .serializers import UserSerializer , ResendOtpSerializer
+from .serializers import UserSerializer , ResendOtpSerializer , SingInSerializer
 from .models import OtpToken,User
 # swagger
 from drf_yasg.utils import swagger_auto_schema
@@ -100,9 +103,6 @@ class VerifyEmailView(APIView):
         user.save()
         user_otp.delete()
 
-        # Log in the user automatically (optional)
-        # login(request, authenticate(username=username, password=user.password))
-
         return Response({'Message': 'Your account has been activated successfully!'} ,status=status.HTTP_200_OK)
 
 
@@ -145,3 +145,39 @@ class ResendOtpView(APIView):
         except Exception as e:
             otp.delete()
             return Response({'error': f"Email sending failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class SignInView(APIView):
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        request_body=SingInSerializer,
+        responses={
+            200: "Successfully signed in",
+            400: "Bad request (e.g., invalid data, missing required fields)",
+            401: "Unauthorized (e.g., incorrect credentials)",
+        }
+    )
+    def post(self, request):
+        serializer = SingInSerializer(data=request.data)
+        if serializer.is_valid():
+            username_or_email = serializer.validated_data['username_or_email']
+            password = serializer.validated_data['password']
+
+            try:
+                user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
+            except User.DoesNotExist:
+                return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            if not user.check_password(password):
+                return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            return Response({'message' : 'Successfully signed in'}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+

@@ -1,7 +1,10 @@
 # django
 from django.contrib.auth.hashers import make_password
+from django.db.models import Q
 # drf
 from rest_framework import serializers
+from rest_framework.response import Response
+from rest_framework import status
 # apps
 from .models import User
 import re
@@ -65,6 +68,48 @@ class UserSerializer(serializers.ModelSerializer):
         if len(value) > MAX_NAME_LENGTH:
             raise serializers.ValidationError(f"Last name cannot exceed {MAX_NAME_LENGTH} characters.")
         return value
+
+
+
+
+class SingInSerializer(serializers.ModelSerializer):
+    username_or_email = serializers.CharField(required=True)
+    password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = ('username_or_email', 'password')
+        read_only_fields = ('uuid', 'created_at')
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def validate(self, data):
+        username_or_email = data.get("username_or_email")
+        password = data.get("password")
+
+        print(username_or_email)
+        print(password)
+
+        # Check if username or email is provided
+        if not username_or_email:
+            raise serializers.ValidationError("Username or email is required.")
+
+        # Attempt to authenticate using both username and email
+        user = User.objects.filter(
+            Q(username__iexact=username_or_email) | Q(email__iexact=username_or_email)
+        ).first()
+
+        if user is None:
+            raise serializers.ValidationError("Invalid credentials555.")
+
+        if not user.check_password(password):
+            raise serializers.ValidationError("Invalid password.")
+
+        # if user is None or not user.check_password(password):
+        #     return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        return data
+
+
 
 
 class ResendOtpSerializer(serializers.Serializer):
