@@ -22,8 +22,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('uuid', 'first_name', 'last_name', 'username', 'email', 'password', 'created_at')
-        read_only_fields = ('uuid', 'created_at')
+        fields = ('id', 'first_name', 'last_name', 'username', 'email', 'password', 'created_at')
+        read_only_fields = ('id', 'created_at')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -79,15 +79,12 @@ class SingInSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username_or_email', 'password')
-        read_only_fields = ('uuid', 'created_at')
+        read_only_fields = ('id', 'created_at')
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate(self, data):
         username_or_email = data.get("username_or_email")
         password = data.get("password")
-
-        print(username_or_email)
-        print(password)
 
         # Check if username or email is provided
         if not username_or_email:

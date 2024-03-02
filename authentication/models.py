@@ -5,7 +5,7 @@ from django.db import models
 from django.contrib.auth.hashers import check_password
 
 class User(models.Model):
-    uuid = models.UUIDField(editable=False, primary_key=True, default=uuid.uuid4)
+    id = models.UUIDField(editable=False, primary_key=True, default=uuid.uuid4)
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     username = models.CharField(max_length=150, unique=True)

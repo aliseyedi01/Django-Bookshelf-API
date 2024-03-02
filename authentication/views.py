@@ -15,6 +15,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 # apps
 from .serializers import UserSerializer , ResendOtpSerializer , SingInSerializer
 from .models import OtpToken,User
@@ -164,15 +165,23 @@ class SignInView(APIView):
             username_or_email = serializer.validated_data['username_or_email']
             password = serializer.validated_data['password']
 
-            try:
-                user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
-            except User.DoesNotExist:
+            user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
+            if not user:
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
             if not user.check_password(password):
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-            return Response({'message' : 'Successfully signed in'}, status=status.HTTP_200_OK)
+            # return Response({'message' : 'Successfully signed in'}, status=status.HTTP_200_OK)
+
+            # Generate JWT tokens upon successful authentication
+            access_token = str(AccessToken.for_user(user))
+            refresh_token = str(RefreshToken.for_user(user))
+
+            return Response({
+                'message': 'Successfully signed in',
+                'access_token': access_token,
+                'refresh_token': refresh_token
+            }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
