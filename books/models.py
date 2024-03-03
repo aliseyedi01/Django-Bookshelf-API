@@ -1,8 +1,8 @@
 from django.db import models
-import uuid
+
 
 class Book(models.Model):
-    uuid = models.UUIDField(editable=False, primary_key=True, default=uuid.uuid4)
+    id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=50, unique=True)
     author = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
