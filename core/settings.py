@@ -16,7 +16,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['*']
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -28,21 +28,29 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 3rd party apps
     'rest_framework',
+    "corsheaders",
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'drf_yasg',
-    "corsheaders",
     # My Apps
     'books',
     'authentication'
 ]
 
+ALLOWED_HOSTS = ['*']
+# CORS_ALLOW_ALL_ORIGINS: True
 
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
     "http://localhost:[3000-9000]",
     "http://127.0.0.1:[3000-9000]",
-    "http://localhost:3000",
 ]
+
+# CSRF_TRUSTED_ORIGINS = [
+#     "http://localhost:3000",
+#     "http://localhost:[3000-9000]",
+#     "http://127.0.0.1:[3000-9000]",
+# ]
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -69,13 +77,12 @@ CORS_ALLOW_HEADERS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.common.CommonMiddleware"
 ]
 
 ROOT_URLCONF = 'core.urls'
