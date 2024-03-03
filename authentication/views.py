@@ -19,6 +19,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 # apps
 from .serializers import SingUpSerializer , ResendOtpSerializer , SingInSerializer
 from .models import OtpToken,User
+from .tokens import get_tokens_for_user
 # swagger
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -186,19 +187,11 @@ class SignInView(APIView):
 
             if not user or not user.check_password(password):
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
             if not user.is_verified:
                 return Response({'error': 'Please verify your email address before signing in.'}, status=status.HTTP_403_FORBIDDEN)
 
-            # Generate JWT tokens upon successful authentication
-            access_token = str(AccessToken.for_user(user))
-            refresh_token = str(RefreshToken.for_user(user))
-
-            return Response({
-                'message': 'Successfully signed in',
-                'access_token': access_token,
-                'refresh_token': refresh_token
-            }, status=status.HTTP_200_OK)
+            tokens = get_tokens_for_user(user)
+            return Response({'message': 'Successfully signed in' ,**tokens}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -224,7 +217,7 @@ class SignOutView(APIView):
     )
     def post(self, request):
         refresh_token = request.data["refresh_token"]
-
+        print(refresh_token)
         if refresh_token:
             try:
                 token = RefreshToken(refresh_token)
