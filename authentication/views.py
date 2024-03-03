@@ -14,7 +14,7 @@ from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny , IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 # apps
 from .serializers import SingUpSerializer , ResendOtpSerializer , SingInSerializer
@@ -203,7 +203,35 @@ class SignInView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class SignOutView(APIView):
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type='object',
+            properties={
+                'refresh_token': openapi.Schema(
+                    type='string',
+                    description='The refresh token to be revoked.',
+                    required=['refresh_token'],
+                ),
+            },
+        ),
+        responses={
+            200: "Successfully signed out.",
+            400: "Bad request (e.g., missing refresh token, invalid token).",
+            500: "Internal server error (e.g., token blacklist failure).",
+        }
+    )
+    def post(self, request):
+        refresh_token = request.data["refresh_token"]
 
+        if refresh_token:
+            try:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
 
-
-
+                return Response({'message': 'Successfully signed out'}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({'error': f"Failed to sign out: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)

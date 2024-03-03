@@ -5,7 +5,7 @@ from django.db import models
 from django.contrib.auth.hashers import check_password
 
 class User(models.Model):
-    id = models.UUIDField(editable=False, primary_key=True, default=uuid.uuid4)
+    id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     username = models.CharField(max_length=150, unique=True)
@@ -21,7 +21,7 @@ class User(models.Model):
         return check_password(password, self.password)
 
 class OtpToken(models.Model):
-    uuid = models.UUIDField(editable=False, primary_key=True, default=uuid.uuid4)
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     otp_code = models.CharField(max_length=6, default=secrets.token_hex(3))
     created_at = models.DateTimeField(auto_now_add=True,editable=False)
