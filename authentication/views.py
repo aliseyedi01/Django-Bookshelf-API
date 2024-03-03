@@ -46,7 +46,7 @@ class SignUpView(APIView):
             message = f"""
                 Hi {user}, here is your OTP {otp.otp_code}
                 It expires in 5 minutes, use the url below to redirect back to the website
-                http://127.0.0.1:8000/verify-email/{otp.user.username}
+                https://library-api-t70g.onrender.com/verify-email/{otp.user.username}
             """
             try:
                 send_mail(
@@ -104,7 +104,7 @@ class VerifyEmailView(APIView):
             message = f"""
                 Hi {user}, here is your new OTP {otp.otp_code}
                 It expires in 5 minutes, use the URL below to redirect back to the website
-                http://127.0.0.1:8000/verify-email/{user.username}
+                https://library-api-t70g.onrender.com/verify-email/{user.username}
             """
             try:
                 send_mail(
@@ -148,7 +148,7 @@ class ResendOtpView(APIView):
         message = f"""
             Hi {user.username}, here is your OTP {otp.otp_code}
             It expires in 5 minutes, use the url below to redirect back to the website
-            http://127.0.0.1:8000/verify-email/{user.username}
+            https://library-api-t70g.onrender.com/verify-email/{user.username}
         """
         try:
             send_mail(
