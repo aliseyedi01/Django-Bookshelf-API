@@ -31,9 +31,16 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'drf_yasg',
-        # My Apps
+    "corsheaders",
+    # My Apps
     'books',
     'authentication'
+]
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:[3000-9000]",
+    "http://127.0.0.1:[3000-9000]",
 ]
 
 MIDDLEWARE = [
@@ -44,6 +51,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware"
 ]
 
 ROOT_URLCONF = 'core.urls'
