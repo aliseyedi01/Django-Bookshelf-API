@@ -69,8 +69,6 @@ class SingUpSerializer(serializers.ModelSerializer):
         return value
 
 
-
-
 class SingInSerializer(serializers.ModelSerializer):
     username_or_email = serializers.CharField(required=True)
     password = serializers.CharField(write_only=True, required=True)
@@ -98,8 +96,6 @@ class SingInSerializer(serializers.ModelSerializer):
         return data
 
 
-
-
 class ResendOtpSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 
@@ -109,3 +105,17 @@ class ResendOtpSerializer(serializers.Serializer):
         except User.DoesNotExist:
             raise serializers.ValidationError(f'User with this {value} does not exist')
         return value
+
+
+class VerifyEmailSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    otp_code = serializers.CharField(required=True)
+
+    def validate(self, data):
+        username = data.get('username')
+        otp_code = data.get('otp_code')
+
+        if not username or not otp_code:
+            raise serializers.ValidationError('Missing required fields: username and otp_code')
+
+        return data

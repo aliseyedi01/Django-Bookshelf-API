@@ -17,7 +17,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny , IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 # apps
-from .serializers import SingUpSerializer , ResendOtpSerializer , SingInSerializer
+from .serializers import SingUpSerializer , ResendOtpSerializer , SingInSerializer , VerifyEmailSerializer
 from .models import OtpToken,User
 from .tokens import get_tokens_for_user
 from .utils import generate_and_send_otp
@@ -78,26 +78,23 @@ class VerifyEmailView(APIView):
         }
     )
     def post(self, request):
-        try:
-            username = request.data['username']
-            otp_code = request.data['otp_code']
+        serializer = VerifyEmailSerializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data['username']
+            otp_code = serializer.validated_data['otp_code']
 
-            if not username or not otp_code:
-                return Response({'error': 'Missing required fields: email and otp_code'}, status=status.HTTP_400_BAD_REQUEST)
-
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            return Response({'error': f'User with this username : {username} Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                return Response({'error': f'User with this username: {username} Not Found!'}, status=status.HTTP_404_NOT_FOUND)
 
         user_otp = OtpToken.objects.filter(user=user).order_by('-created_at').first()
         if not user_otp:
             return Response({'error': 'No OTP found for this user'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validate OTP code
-        if request.data.get('otp_code') != user_otp.otp_code:
+        if otp_code != user_otp.otp_code:
             return Response({'error': 'Invalid OTP code'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check for expired OTP
         if user_otp.expires_at < now():
             user_otp.delete()
             try:
@@ -109,7 +106,6 @@ class VerifyEmailView(APIView):
         user.is_verified = True
         user.save()
         user_otp.delete()
-
         return Response({'Message': 'Your account has been activated successfully!'} ,status=status.HTTP_200_OK)
 
 
