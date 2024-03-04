@@ -38,32 +38,28 @@ INSTALLED_APPS = [
 ]
 
 # ALLOWED_HOSTS = ['*']
-
-
 ALLOWED_HOSTS = [
-    "*",
     "127.0.0.1",
+    "127.0.0.1:3000",
     "localhost",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://library-api-t70g.onrender.com"
 ]
 
-
-
-CORS_ALLOW_ALL_ORIGINS: True
-
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-#     "http://127.0.0.1:3000",
-#     "http://localhost:[3000-9000]",
-#     "http://127.0.0.1:[3000-9000]",
-# ]
-
-CSRF_TRUSTED_ORIGINS = [
+# CORS_ALLOW_ALL_ORIGINS: True
+CORS_ALLOWED_ORIGINS = [
+    "localhost:3000",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "http://localhost:[3000-9000]",
-    "http://127.0.0.1:[3000-9000]",
+    "http://localhost:5000",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "localhost:3000",
+    "https://127.0.0.1",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
