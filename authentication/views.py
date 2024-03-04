@@ -20,9 +20,12 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from .serializers import SingUpSerializer , ResendOtpSerializer , SingInSerializer
 from .models import OtpToken,User
 from .tokens import get_tokens_for_user
+from .utils import generate_and_send_otp
 # swagger
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+
+
 
 
 
@@ -42,27 +45,7 @@ class SignUpView(APIView):
         serializer = SingUpSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            # Generate and send OTP
-            otp = OtpToken.objects.create(user=user, expires_at=timezone.now() + timezone.timedelta(minutes=1))
-            message = f"""
-                Hi {user}, here is your OTP {otp.otp_code}
-                It expires in 5 minutes, use the url below to redirect back to the website
-                https://library-api-t70g.onrender.com/verify-email/{otp.user.username}
-            """
-            try:
-                send_mail(
-                    subject="Email Verification",
-                    message=message,
-                    from_email="aliotptest@gmail.com",
-                    recipient_list=[user.email],
-                    fail_silently=False,
-                )
-            except Exception as e:
-                user.delete()
-                return Response({
-                    'error': f"Email sending failed: {str(e)}"
-                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            otp = generate_and_send_otp(user)
             return Response({
                 'Message': 'Account created successfully! An OTP has been sent to your email for verification',
                 'data': { 'otp_test' :  otp.otp_code}
@@ -117,25 +100,11 @@ class VerifyEmailView(APIView):
         # Check for expired OTP
         if user_otp.expires_at < now():
             user_otp.delete()
-            # Generate and send a new OTP
-            otp = OtpToken.objects.create(user=user, expires_at=timezone.now() + timezone.timedelta(minutes=1))
-            message = f"""
-                Hi {user}, here is your new OTP {otp.otp_code}
-                It expires in 5 minutes, use the URL below to redirect back to the website
-                https://library-api-t70g.onrender.com/verify-email/{user.username}
-            """
             try:
-                send_mail(
-                    subject="Email Verification",
-                    message=message,
-                    from_email="aliotptest@gmail.com",
-                    recipient_list=[user.email],
-                    fail_silently=False,
-                )
+                otp = generate_and_send_otp(user)
+                return Response({'Message': 'OTP has expired, a new OTP has been sent to your email address'}, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({'error': f"Email sending failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            return Response({'Message': 'OTP has expired , A new OTP has been sent to your email address'}, status=status.HTTP_200_OK)
 
         user.is_verified = True
         user.save()
@@ -160,26 +129,15 @@ class ResendOtpView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         user_email = request.data["email"]
-        user = User.objects.get(email=user_email)
-        otp = OtpToken.objects.create(user=user, expires_at=timezone.now() + timezone.timedelta(minutes=1))
-
-        message = f"""
-            Hi {user.username}, here is your OTP {otp.otp_code}
-            It expires in 5 minutes, use the url below to redirect back to the website
-            https://library-api-t70g.onrender.com/verify-email/{user.username}
-        """
         try:
-            send_mail(
-                subject="Email Verification",
-                message=message,
-                from_email="aliotptest@gmail.com",
-                recipient_list=[user.email],
-                fail_silently=False,
-            )
+            user = User.objects.get(email=user_email)
+            otp = generate_and_send_otp(user)
             return Response({'Message': 'A new OTP has been sent to your email address'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': f'User with this email : {user_email} Not Found!'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            otp.delete()
             return Response({'error': f"Email sending failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 class SignInView(APIView):
