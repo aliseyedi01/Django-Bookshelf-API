@@ -111,6 +111,13 @@ class VerifyEmailSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     otp_code = serializers.CharField(required=True)
 
+    def validate_username(self, value):
+        try:
+            user = User.objects.get(username=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError(f'User with username "{value}" not found')
+        return value
+
     def validate(self, data):
         username = data.get('username')
         otp_code = data.get('otp_code')

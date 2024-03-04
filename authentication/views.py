@@ -53,23 +53,9 @@ class SignUpView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class VerifyEmailView(APIView):
     @swagger_auto_schema(
-        request_body=openapi.Schema(
-            type='object',
-            properties={
-                'username': openapi.Schema(
-                    type='string',
-                    description='The user\'s username.',
-                ),
-                'otp_code': openapi.Schema(
-                    type='string',
-                    description='The OTP code sent to the user\'s email.',
-                ),
-            },
-            required=['username', 'otp_code'],
-        ),
+        request_body=VerifyEmailSerializer,
         responses={
             200: "Account activated successfully!",
             400: "Bad request (e.g., invalid OTP code, expired OTP)",
@@ -83,30 +69,30 @@ class VerifyEmailView(APIView):
             username = serializer.validated_data['username']
             otp_code = serializer.validated_data['otp_code']
 
-            try:
-                user = User.objects.get(username=username)
-            except User.DoesNotExist:
-                return Response({'error': f'User with this username: {username} Not Found!'}, status=status.HTTP_404_NOT_FOUND)
+            user = User.objects.get(username=username)
+            user_otp = OtpToken.objects.filter(user=user).order_by('-created_at').first()
 
-        user_otp = OtpToken.objects.filter(user=user).order_by('-created_at').first()
-        if not user_otp:
-            return Response({'error': 'No OTP found for this user'}, status=status.HTTP_400_BAD_REQUEST)
+            if not user_otp:
+                return Response({'error': 'No OTP found for this user'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if otp_code != user_otp.otp_code:
-            return Response({'error': 'Invalid OTP code'}, status=status.HTTP_400_BAD_REQUEST)
+            if otp_code != user_otp.otp_code:
+                return Response({'error': 'Invalid OTP code'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if user_otp.expires_at < now():
+            if user_otp.expires_at < timezone.now():
+                user_otp.delete()
+                try:
+                    otp = generate_and_send_otp(user)
+                    return Response({'Message': 'OTP has expired, a new OTP has been sent to your email address'}, status=status.HTTP_200_OK)
+                except Exception as e:
+                    return Response({'error': f"Email sending failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            user.is_verified = True
+            user.save()
             user_otp.delete()
-            try:
-                otp = generate_and_send_otp(user)
-                return Response({'Message': 'OTP has expired, a new OTP has been sent to your email address'}, status=status.HTTP_200_OK)
-            except Exception as e:
-                return Response({'error': f"Email sending failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        user.is_verified = True
-        user.save()
-        user_otp.delete()
-        return Response({'Message': 'Your account has been activated successfully!'} ,status=status.HTTP_200_OK)
+            return Response({'Message': 'Your account has been activated successfully!'}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ResendOtpView(APIView):
