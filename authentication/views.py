@@ -59,9 +59,14 @@ class SignUpView(APIView):
                 )
             except Exception as e:
                 user.delete()
-                return Response({'error': f"Email sending failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response({
+                    'error': f"Email sending failed: {str(e)}"
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            return Response({'Message': 'Account created successfully! An OTP has been sent to your email for verification'} ,status=status.HTTP_201_CREATED)
+            return Response({
+                'Message': 'Account created successfully! An OTP has been sent to your email for verification',
+                'data': { 'otp_test' :  otp.otp_code}
+                },status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
