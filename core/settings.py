@@ -39,7 +39,7 @@ INSTALLED_APPS = [
 
 # ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = [
-    "library-api-t70g.onrender.com"
+    "*"
     "127.0.0.1",
     "127.0.0.1:3000",
     "localhost",
