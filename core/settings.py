@@ -37,15 +37,27 @@ INSTALLED_APPS = [
     'authentication'
 ]
 
-ALLOWED_HOSTS = ['*']
-# CORS_ALLOW_ALL_ORIGINS: True
+# ALLOWED_HOSTS = ['*']
 
-CORS_ALLOWED_ORIGINS = [
+
+ALLOWED_HOSTS = [
+    "*",
+    "127.0.0.1",
+    "localhost",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "http://localhost:[3000-9000]",
-    "http://127.0.0.1:[3000-9000]",
 ]
+
+
+
+CORS_ALLOW_ALL_ORIGINS: True
+
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "http://127.0.0.1:3000",
+#     "http://localhost:[3000-9000]",
+#     "http://127.0.0.1:[3000-9000]",
+# ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
