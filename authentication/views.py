@@ -76,20 +76,32 @@ class VerifyEmailView(APIView):
         request_body=openapi.Schema(
             type='object',
             properties={
+                'username': openapi.Schema(
+                    type='string',
+                    description='The user\'s username.',
+                ),
                 'otp_code': openapi.Schema(
                     type='string',
                     description='The OTP code sent to the user\'s email.',
                 ),
             },
+            required=['username', 'otp_code'],
         ),
         responses={
-            200:"Account activated successfully!",
+            200: "Account activated successfully!",
             400: "Bad request (e.g., invalid OTP code, expired OTP)",
             404: "User with the provided username not found",
+            401: "Unauthorized (if username or OTP is invalid)",
         }
     )
-    def post(self, request, username):
+    def post(self, request):
         try:
+            username = request.data['username']
+            otp_code = request.data['otp_code']
+
+            if not username or not otp_code:
+                return Response({'error': 'Missing required fields: email and otp_code'}, status=status.HTTP_400_BAD_REQUEST)
+
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             return Response({'error': f'User with this username : {username} Not Found!'}, status=status.HTTP_404_NOT_FOUND)
