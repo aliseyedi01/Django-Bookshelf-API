@@ -6,7 +6,7 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework import status
 # apps
-from .models import User
+from .models import User , OtpToken
 import re
 
 
@@ -113,7 +113,7 @@ class VerifyEmailSerializer(serializers.Serializer):
 
     def validate_username(self, value):
         try:
-            user = User.objects.get(username=value)
+            user = OtpToken.objects.get(username=value)
         except User.DoesNotExist:
             raise serializers.ValidationError(f'User with username "{value}" not found')
         return value

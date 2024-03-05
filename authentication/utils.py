@@ -4,18 +4,20 @@ from django.utils import timezone
 
 
 def generate_and_send_otp(user):
-    otp = OtpToken.objects.create(user=user, expires_at=timezone.now() + timezone.timedelta(minutes=1))
+    username = user['username']
+    email = user['email']
+    otp = OtpToken.objects.create(username=username, expires_at=timezone.now() + timezone.timedelta(minutes=1))
     message = f"""
-        Hi {user.username}, here is your OTP {otp.otp_code}
+        Hi {username}, here is your OTP {otp.otp_code}
         It expires in 5 minutes, use the URL below to redirect back to the website
-        https://library-api-t70g.onrender.com/verify-email/{user.username}
+        https://library-api-t70g.onrender.com/verify-email/{username}
     """
     try:
         send_mail(
             subject="Email Verification",
             message=message,
             from_email="aliotptest@gmail.com",
-            recipient_list=[user.email],
+            recipient_list=[email],
             fail_silently=False,
         )
         return otp
