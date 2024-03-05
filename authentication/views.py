@@ -19,7 +19,7 @@ from rest_framework.permissions import AllowAny , IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 # apps
 from .serializers import SingUpSerializer , ResendOtpSerializer , SingInSerializer , VerifyEmailSerializer
-from .models import OtpToken,User
+from .models import User , OtpToken
 from .tokens import get_tokens_for_user
 from .utils import generate_and_send_otp
 # swagger
@@ -47,9 +47,13 @@ class SignUpView(APIView):
         if serializer.is_valid():
             user_data = serializer.validated_data
             username = user_data['username']
-            print('user data' , username)
             cache_key = f'signup_data_{username}'
-            cache.set(cache_key, user_data , timeout=60)
+
+
+            cache.delete(cache_key)
+            cache.set(cache_key, user_data , timeout=5 * 60)
+
+            OtpToken.objects.filter(username=username).delete()
             otp = generate_and_send_otp(user_data)
             return Response({
                 'Message': 'Account created successfully! An OTP has been sent to your email for verification',
@@ -72,20 +76,22 @@ class VerifyEmailView(APIView):
         serializer = VerifyEmailSerializer(data=request.data)
         if serializer.is_valid():
             username = serializer.validated_data['username']
+            print('username2222' , username)
             otp_code = serializer.validated_data['otp_code']
+            print('otp_code2222' , otp_code)
 
             cache_key = f'signup_data_{username}'
             cached_data = cache.get(cache_key)
-
+            print('cached data', cached_data)
 
             if not cached_data:
                 return Response({'error': 'Cached data not found'}, status=status.HTTP_400_BAD_REQUEST)
 
             user = cached_data
 
-            # user = User.objects.get(username=username)
-            user_otp = OtpToken.objects.filter(username=username).order_by('-created_at').first()
+            user_otp = OtpToken.objects.filter(username=username).order_by("created_at").first()
 
+            print('user otp pp' , user_otp.otp_code)
             if not user_otp:
                 return Response({'error': 'No OTP found for this user'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -95,6 +101,7 @@ class VerifyEmailView(APIView):
             if user_otp.expires_at < timezone.now():
                 user_otp.delete()
                 try:
+                    OtpToken.objects.filter(username=username).delete()
                     otp = generate_and_send_otp(user)
                     return Response({'Message': 'OTP has expired, a new OTP has been sent to your email address'}, status=status.HTTP_200_OK)
                 except Exception as e:

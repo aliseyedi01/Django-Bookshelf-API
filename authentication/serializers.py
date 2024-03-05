@@ -114,6 +114,7 @@ class VerifyEmailSerializer(serializers.Serializer):
     def validate_username(self, value):
         try:
             user = OtpToken.objects.get(username=value)
+            print('user 333' , user)
         except User.DoesNotExist:
             raise serializers.ValidationError(f'User with username "{value}" not found')
         return value

@@ -22,11 +22,10 @@ class User(models.Model):
 
 class OtpToken(models.Model):
     id = models.AutoField(primary_key=True)
-    # user = models.ForeignKey(User, on_delete=models.CASCADE)
-    username = models.CharField(max_length=150, unique=True)
+    username = models.CharField(max_length=150,unique=True)
     otp_code = models.CharField(max_length=6, default=secrets.token_hex(3))
     created_at = models.DateTimeField(auto_now_add=True,editable=False)
     expires_at = models.DateTimeField(blank=True, null=True,editable=False)
 
     def __str__(self):
-        return self.user.username
+        return self.username
