@@ -174,8 +174,8 @@ class SignInView(APIView):
 
             tokens = get_tokens_for_user(user)
             return Response({
-                'message': 'Successfully signed in' ,
-                **tokens
+                'message': 'Successfully signed in',
+                'data' : {**tokens},
                 }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
