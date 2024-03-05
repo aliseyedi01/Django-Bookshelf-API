@@ -133,7 +133,10 @@ class ResendOtpView(APIView):
         try:
             OtpToken.objects.filter(username=username).delete()
             otp = generate_and_send_otp(cached_data)
-            return Response({'Message': 'A new OTP has been sent to your email address'}, status=status.HTTP_200_OK)
+            return Response({
+                'Message': 'A new OTP has been sent to your email address',
+                'data': { 'otp_test' :  otp.otp_code}
+                }, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'error': f'User with this username : {username} Not Found!'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
