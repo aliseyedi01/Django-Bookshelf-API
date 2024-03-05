@@ -1,6 +1,7 @@
 # django
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
+from django.core.cache import cache
 # drf
 from rest_framework import serializers
 from rest_framework.response import Response
@@ -97,13 +98,13 @@ class SingInSerializer(serializers.ModelSerializer):
 
 
 class ResendOtpSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
 
-    def validate_email(self, value):
-        try:
-            User.objects.get(email=value)
-        except User.DoesNotExist:
-            raise serializers.ValidationError(f'User with this {value} does not exist')
+    def validate_username(self, value):
+        cache_key = f'signup_data_{value}'
+        cached_data = cache.get(cache_key)
+        if not cached_data:
+            raise serializers.ValidationError(f'User with this username: {value} does not exist')
         return value
 
 
