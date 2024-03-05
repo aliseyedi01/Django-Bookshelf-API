@@ -27,18 +27,12 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 
-
-
-
 class SignUpView(APIView):
     permission_classes = [AllowAny]
     @swagger_auto_schema(
         request_body=SingUpSerializer,
         responses={
-            201: openapi.Response(
-                description="Account created successfully!",
-                schema=SingUpSerializer(many=True),
-            ),
+            201: "Account created successfully!",
             400: "Bad request (e.g., invalid data, missing required fields)",
         }
     )
@@ -104,7 +98,9 @@ class VerifyEmailView(APIView):
             user_otp.delete()
             cache.delete(cache_key)
 
-            return Response({'Message': 'Your account has been activated successfully!'}, status=status.HTTP_200_OK)
+            return Response({
+                'message': 'Your account has been activated successfully!'
+                }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -128,7 +124,9 @@ class ResendOtpView(APIView):
         cache_key = f'signup_data_{username}'
         cached_data = cache.get(cache_key)
         if not cached_data:
-            return Response({'error': 'Cached data not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error': 'Cached data not found'
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             OtpToken.objects.filter(username=username).delete()
@@ -165,12 +163,20 @@ class SignInView(APIView):
             user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
 
             if not user or not user.check_password(password):
-                return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response({
+                    'error': 'Invalid credentials'
+                    }, status=status.HTTP_401_UNAUTHORIZED)
+
             if not user.is_verified:
-                return Response({'error': 'Please verify your email address before signing in.'}, status=status.HTTP_403_FORBIDDEN)
+                return Response({
+                    'error': 'Please verify your email address before signing in.'
+                    }, status=status.HTTP_403_FORBIDDEN)
 
             tokens = get_tokens_for_user(user)
-            return Response({'message': 'Successfully signed in' ,**tokens}, status=status.HTTP_200_OK)
+            return Response({
+                'message': 'Successfully signed in' ,
+                **tokens
+                }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -201,8 +207,14 @@ class SignOutView(APIView):
                 token = RefreshToken(refresh_token)
                 token.blacklist()
 
-                return Response({'message': 'Successfully signed out'}, status=status.HTTP_200_OK)
+                return Response({
+                    'message': 'Successfully signed out'
+                    }, status=status.HTTP_200_OK)
             except Exception as e:
-                return Response({'error': f"Failed to sign out: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({
+                    'error': f"Failed to sign out: {str(e)}"
+                    }, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'error': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error': 'Refresh token is required'
+                }, status=status.HTTP_400_BAD_REQUEST)
