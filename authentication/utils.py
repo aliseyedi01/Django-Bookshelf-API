@@ -1,7 +1,7 @@
 from .models import OtpToken,User
 from django.core.mail import send_mail
 from django.utils import timezone
-
+from drf_spectacular.utils import OpenApiResponse
 
 def generate_and_send_otp(user):
     username = user['username']
@@ -25,3 +25,12 @@ def generate_and_send_otp(user):
         otp.delete()
         raise e
 
+
+class SwaggerResponse:
+    UNAUTHORIZED = OpenApiResponse(description="Unauthorized")
+    FORBIDDEN = OpenApiResponse(description="Forbidden")
+    NOT_FOUND = OpenApiResponse(description="Not Found")
+    SUCCESS = OpenApiResponse(description="Success")
+    BAD_REQUEST = OpenApiResponse(description="Bad Request")
+    INTERNAL_SERVER_ERROR = OpenApiResponse(description="Internal Server Error")
+    CREATED = OpenApiResponse(description="Created")

@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     "corsheaders",
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
-    'drf_yasg',
+    'drf_spectacular',
     # My Apps
     'books',
     'authentication'
@@ -182,6 +182,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 REST_FRAMEWORK_SIMPLEJWT = {
@@ -189,20 +190,19 @@ REST_FRAMEWORK_SIMPLEJWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
-# swagger setting
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header',
-            'description': "Enter your bearer token"
-        }
-    },
-    'DEFAULT_MODEL_RENDERING': 'example',
-    'EXAMPLES_PROVIDED': True,
-    'USE_SESSION_AUTH': False,
-    'JSON_EDITOR': True,
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': '📚 Book Library API',
+    'DESCRIPTION': "**Book Library API (v1): CRUD, search, filter, integrate. \n By: @aliseyedi01** 💻",
+    'VERSION': 'v1.0.0',
+    'SERVE_INCLUDE_SCHEMA': True,
+    'CONTACT': {'name': "My Github", 'url': "https://github.com/aliseyedi01"},
+    'LICENSE': { 'name' :"BSD License"},
+    "COMPONENT_SPLIT_REQUEST": True,
+    'TAGS': [
+        {'name': 'auth', 'description': 'Authentication-related endpoints'},
+        {'name': 'token', 'description': 'Token-related endpoints'},
+    ],
 }
 
 

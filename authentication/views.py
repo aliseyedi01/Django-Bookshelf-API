@@ -23,21 +23,23 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from .serializers import SingUpSerializer , ResendOtpSerializer , SingInSerializer , VerifyEmailSerializer
 from .models import User , OtpToken
 from .tokens import get_tokens_for_user
-from .utils import generate_and_send_otp
+from .utils import generate_and_send_otp , SwaggerResponse
 # swagger
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema , OpenApiExample , OpenApiResponse
+from rest_framework_simplejwt.views import TokenRefreshView ,TokenVerifyView
+
 
 
 class SignUpView(APIView):
     permission_classes = [AllowAny]
-    @swagger_auto_schema(
-        request_body=SingUpSerializer,
+    @extend_schema(
+        request=SingUpSerializer,
+        tags=["auth"],
         responses={
-            201: "Account created successfully!",
-            400: "Bad request (e.g., invalid data, missing required fields)",
+            201 : SwaggerResponse.CREATED,
+            400 : SwaggerResponse.BAD_REQUEST
         }
-    )
+        )
     def post(self, request):
         serializer = SingUpSerializer(data=request.data)
         if serializer.is_valid():
@@ -59,15 +61,15 @@ class SignUpView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class VerifyEmailView(APIView):
-    @swagger_auto_schema(
-        request_body=VerifyEmailSerializer,
-        responses={
-            200: "Account activated successfully!",
-            400: "Bad request (e.g., invalid OTP code, expired OTP)",
-            404: "User with the provided username not found",
-            401: "Unauthorized (if username or OTP is invalid)",
+    @extend_schema(
+        request=VerifyEmailSerializer,
+        tags=["auth"],
+        responses= {
+            200 : SwaggerResponse.SUCCESS,
+            400 : SwaggerResponse.BAD_REQUEST,
+            401 : SwaggerResponse.UNAUTHORIZED,
+            404 : SwaggerResponse.NOT_FOUND
         }
     )
     def post(self, request):
@@ -107,13 +109,14 @@ class VerifyEmailView(APIView):
 
 
 class ResendOtpView(APIView):
-    @swagger_auto_schema(
-        request_body=ResendOtpSerializer,
+    @extend_schema(
+        request=ResendOtpSerializer,
+        tags=["auth"],
         responses={
-            200: "A new OTP has been sent to your email address.",
-            400: "Bad request (e.g., invalid data, missing required fields)",
-            404: "User with the provided email not found",
-            500: "Internal server error (e.g., email sending failure)",
+            200 : SwaggerResponse.SUCCESS,
+            400 : SwaggerResponse.BAD_REQUEST,
+            404 : SwaggerResponse.NOT_FOUND,
+            500 : SwaggerResponse.INTERNAL_SERVER_ERROR
         }
     )
     def post(self, request):
@@ -146,13 +149,14 @@ class ResendOtpView(APIView):
 class SignInView(APIView):
     permission_classes = [AllowAny]
 
-    @swagger_auto_schema(
-        request_body=SingInSerializer,
+    @extend_schema(
+        request=SingInSerializer,
+        tags=["auth"],
         responses={
-            200: "Successfully signed in",
-            400: "Bad request (e.g., invalid data, missing required fields)",
-            401: "Unauthorized (e.g., incorrect credentials)",
-            403: "Forbidden (e.g., user not verified)"
+            200: SwaggerResponse.SUCCESS,
+            400: SwaggerResponse.BAD_REQUEST,
+            401: SwaggerResponse.UNAUTHORIZED,
+            403: SwaggerResponse.FORBIDDEN
         }
     )
     def post(self, request):
@@ -175,11 +179,6 @@ class SignInView(APIView):
 
             tokens = get_tokens_for_user(user)
 
-            # return Response({
-            #     'message': 'Successfully signed in',
-            #     'data' : {**tokens},
-            #     }, status=status.HTTP_200_OK)
-
             # Set tokens in cookies
             response = JsonResponse({
                 'message': 'Successfully signed in',
@@ -197,23 +196,15 @@ class SignInView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class SignOutView(APIView):
     permission_classes = [IsAuthenticated]
-    @swagger_auto_schema(
-        request_body=openapi.Schema(
-            type='object',
-            properties={
-                'refresh_token': openapi.Schema(
-                    type='string',
-                    description='The refresh token to be revoked.',
-                    required=['refresh_token'],
-                ),
-            },
-        ),
+    @extend_schema(
+        tags=["auth"],
         responses={
-            200: "Successfully signed out.",
-            400: "Bad request (e.g., missing refresh token, invalid token).",
-            500: "Internal server error (e.g., token blacklist failure).",
+            200 : SwaggerResponse.SUCCESS,
+            400 : SwaggerResponse.BAD_REQUEST,
+            500 : SwaggerResponse.INTERNAL_SERVER_ERROR
         }
     )
     def post(self, request):
@@ -234,3 +225,15 @@ class SignOutView(APIView):
             return Response({
                 'error': 'Refresh token is required'
                 }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MyTokenRefreshView(TokenRefreshView):
+    @extend_schema(tags=["token"])
+    def post(self, *args, **kwargs):
+        return super().post(*args, **kwargs)
+
+
+class MyTokenVerifyView(TokenVerifyView):
+    @extend_schema(tags=["token"])
+    def post(self, *args, **kwargs):
+        return super().post(*args, **kwargs)

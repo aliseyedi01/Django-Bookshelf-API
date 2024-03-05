@@ -1,6 +1,5 @@
 from django.urls import path, include
-from .views import SignUpView , SignInView, SignOutView , VerifyEmailView , ResendOtpView
-from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
+from .views import SignUpView , SignInView, SignOutView , VerifyEmailView , ResendOtpView , MyTokenRefreshView , MyTokenVerifyView
 
 
 urlpatterns = [
@@ -9,6 +8,6 @@ urlpatterns = [
     path("resend-otp/", ResendOtpView.as_view(), name="resend-otp"),
     path("signin/", SignInView.as_view(), name="signin"),
     path("signout/", SignOutView.as_view(), name="signout"),
-    path('refresh-token/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('verify-token/', TokenVerifyView.as_view(), name='token_verify'),
+    path('refresh-token/', MyTokenRefreshView.as_view(), name='token_refresh',),
+    path('verify-token/', MyTokenVerifyView.as_view(), name='token_verify'),
 ]

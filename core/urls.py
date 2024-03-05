@@ -5,21 +5,13 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 # drf
 from rest_framework import permissions
 # Swagger
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
-
-# Schema Swagger
-schema_view = get_schema_view(
-	openapi.Info(
-			title="📚 Book Library API",
-			default_version='v1',
-			description="**Book Library API (v1): CRUD, search, filter, integrate. \n By: @aliseyedi01** 💻",
-			contact=openapi.Contact(name="My Github", url="https://github.com/aliseyedi01"),
-            license=openapi.License(name="BSD License"),
-	),
-	public=True,
-	permission_classes=(permissions.AllowAny,),
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
 )
+
+
 
 
 
@@ -27,9 +19,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('book/', include('books.urls')),
     path('auth/', include('authentication.urls')),
-	  path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-	  path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path("swagger/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+    path("schema/", SpectacularAPIView.as_view(), name="schema"),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
