@@ -15,6 +15,7 @@ MAX_NAME_LENGTH = 30
 
 
 class BaseCustomSerializer(serializers.Serializer):
+
     def to_internal_value(self, data):
         try:
             return super().to_internal_value(data)
@@ -38,10 +39,6 @@ class SingUpSerializer(BaseCustomSerializer,serializers.ModelSerializer):
         fields = ('id', 'first_name', 'last_name', 'username', 'email', 'password', 'created_at')
         read_only_fields = ('id', 'created_at')
         extra_kwargs = {'password': {'write_only': True}}
-
-    def create(self, validated_data):
-        validated_data['password'] = make_password(validated_data['password'])
-        return super().create(validated_data)
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
@@ -137,5 +134,4 @@ class SingInSerializer(BaseCustomSerializer,serializers.ModelSerializer):
 
         if not user or not user.check_password(password):
             raise serializers.ValidationError("Invalid credentials.")
-
         return data

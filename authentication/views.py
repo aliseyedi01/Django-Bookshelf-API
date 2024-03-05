@@ -11,6 +11,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.core.cache import cache
+from django.contrib.auth.hashers import make_password
 # drf
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -40,6 +41,7 @@ class SignUpView(APIView):
         serializer = SingUpSerializer(data=request.data)
         if serializer.is_valid():
             user_data = serializer.validated_data
+            user_data['password'] = make_password(serializer.validated_data['password'])
 
             username = user_data['username']
             cache_key = f'signup_data_{username}'
@@ -54,6 +56,7 @@ class SignUpView(APIView):
                 'data': { 'otp_test' :  otp.otp_code}
                 },status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class VerifyEmailView(APIView):
@@ -73,21 +76,18 @@ class VerifyEmailView(APIView):
             otp_code = serializer.validated_data['otp_code']
 
             cache_key = f'signup_data_{username}'
-            cached_data = cache.get(cache_key)
 
+            cached_data = cache.get(cache_key)
             if not cached_data:
                 return Response({'error': 'Cached data not found'}, status=status.HTTP_400_BAD_REQUEST)
-
             user = cached_data
 
             user_otp = OtpToken.objects.filter(username=username).order_by("created_at").first()
-
             if not user_otp:
                 return Response({'error': 'No OTP found for this user'}, status=status.HTTP_400_BAD_REQUEST)
 
             if otp_code != user_otp.otp_code:
                 return Response({'error': 'Invalid OTP code'}, status=status.HTTP_400_BAD_REQUEST)
-
 
             if user_otp.expires_at < timezone.now():
                 return Response({'error': 'OTP has expired'}, status=status.HTTP_400_BAD_REQUEST)
