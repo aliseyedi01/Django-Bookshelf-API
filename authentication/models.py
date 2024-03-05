@@ -22,10 +22,19 @@ class User(models.Model):
 
 class OtpToken(models.Model):
     id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=150,unique=True)
-    otp_code = models.CharField(max_length=6, default=secrets.token_hex(3))
-    created_at = models.DateTimeField(auto_now_add=True,editable=False)
-    expires_at = models.DateTimeField(blank=True, null=True,editable=False)
+    username = models.CharField(max_length=150, unique=True)
+    otp_code = models.CharField(max_length=6, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    expires_at = models.DateTimeField(blank=True, null=True, editable=False)
 
     def __str__(self):
         return self.username
+
+    def save(self, *args, **kwargs):
+        # Generate a unique OTP code
+        while True:
+            unique_otp_code = secrets.token_hex(3)
+            if not OtpToken.objects.filter(otp_code=unique_otp_code).exists():
+                self.otp_code = unique_otp_code
+                break
+        super().save(*args, **kwargs)
