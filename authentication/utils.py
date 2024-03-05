@@ -6,7 +6,7 @@ from django.utils import timezone
 def generate_and_send_otp(user):
     username = user['username']
     email = user['email']
-    otp = OtpToken.objects.create(username=username, expires_at=timezone.now() + timezone.timedelta(minutes=1))
+    otp = OtpToken.objects.create(username=username, expires_at=timezone.now() + timezone.timedelta(seconds=90))
     message = f"""
         Hi {username}, here is your OTP {otp.otp_code}
         It expires in 5 minutes, use the URL below to redirect back to the website

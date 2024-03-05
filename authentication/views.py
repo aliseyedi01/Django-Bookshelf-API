@@ -51,7 +51,7 @@ class SignUpView(APIView):
 
 
             cache.delete(cache_key)
-            cache.set(cache_key, user_data , timeout=5 * 60)
+            cache.set(cache_key, user_data, timeout=900)
 
             OtpToken.objects.filter(username=username).delete()
             otp = generate_and_send_otp(user_data)
@@ -76,13 +76,10 @@ class VerifyEmailView(APIView):
         serializer = VerifyEmailSerializer(data=request.data)
         if serializer.is_valid():
             username = serializer.validated_data['username']
-            print('username2222' , username)
             otp_code = serializer.validated_data['otp_code']
-            print('otp_code2222' , otp_code)
 
             cache_key = f'signup_data_{username}'
             cached_data = cache.get(cache_key)
-            print('cached data', cached_data)
 
             if not cached_data:
                 return Response({'error': 'Cached data not found'}, status=status.HTTP_400_BAD_REQUEST)
@@ -91,21 +88,16 @@ class VerifyEmailView(APIView):
 
             user_otp = OtpToken.objects.filter(username=username).order_by("created_at").first()
 
-            print('user otp pp' , user_otp.otp_code)
             if not user_otp:
                 return Response({'error': 'No OTP found for this user'}, status=status.HTTP_400_BAD_REQUEST)
 
             if otp_code != user_otp.otp_code:
                 return Response({'error': 'Invalid OTP code'}, status=status.HTTP_400_BAD_REQUEST)
 
+
             if user_otp.expires_at < timezone.now():
-                user_otp.delete()
-                try:
-                    OtpToken.objects.filter(username=username).delete()
-                    otp = generate_and_send_otp(user)
-                    return Response({'Message': 'OTP has expired, a new OTP has been sent to your email address'}, status=status.HTTP_200_OK)
-                except Exception as e:
-                    return Response({'error': f"Email sending failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response({'error': 'OTP has expired'}, status=status.HTTP_400_BAD_REQUEST)
+
             user_register = User.objects.create(**user)
             user_register.is_verified = True
             user_register.save()
@@ -196,7 +188,6 @@ class SignOutView(APIView):
     )
     def post(self, request):
         refresh_token = request.data["refresh_token"]
-        print(refresh_token)
         if refresh_token:
             try:
                 token = RefreshToken(refresh_token)
