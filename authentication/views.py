@@ -12,6 +12,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.core.cache import cache
 from django.contrib.auth.hashers import make_password
+from django.http import JsonResponse
 # drf
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -173,10 +174,25 @@ class SignInView(APIView):
                     }, status=status.HTTP_403_FORBIDDEN)
 
             tokens = get_tokens_for_user(user)
-            return Response({
+
+            # return Response({
+            #     'message': 'Successfully signed in',
+            #     'data' : {**tokens},
+            #     }, status=status.HTTP_200_OK)
+
+            # Set tokens in cookies
+            response = JsonResponse({
                 'message': 'Successfully signed in',
-                'data' : {**tokens},
-                }, status=status.HTTP_200_OK)
+                'data': tokens
+            })
+
+            # Set access token in a cookie
+            response.set_cookie('access_token', tokens['access_token'], httponly=True)
+
+            # Set refresh token in a cookie
+            response.set_cookie('refresh_token', tokens['refresh_token'], httponly=True)
+
+            return response
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
