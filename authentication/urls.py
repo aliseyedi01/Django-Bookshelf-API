@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path, include , re_path
 from .views import ( SignUpView , SignInView, SignOutView , VerifyEmailView ,
 ResendOtpView , MyTokenRefreshView , MyTokenVerifyView)
 
@@ -9,6 +9,4 @@ urlpatterns = [
     path("resend-otp/", ResendOtpView.as_view(), name="resend-otp"),
     path("signin/", SignInView.as_view(), name="signin"),
     path("signout/", SignOutView.as_view(), name="signout"),
-    path('refresh-token/', MyTokenRefreshView.as_view(), name='token_refresh',),
-    path('verify-token/', MyTokenVerifyView.as_view(), name='token_verify'),
 ]
