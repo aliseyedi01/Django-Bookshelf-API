@@ -34,6 +34,7 @@ class SignUpView(APIView):
     permission_classes = [AllowAny]
     @extend_schema(
         request=SingUpSerializer,
+        summary="Sing Up User",
         tags=["auth"],
         responses={
             201 : SwaggerResponse.CREATED,
@@ -64,6 +65,7 @@ class SignUpView(APIView):
 class VerifyEmailView(APIView):
     @extend_schema(
         request=VerifyEmailSerializer,
+        summary="Check OTP",
         tags=["auth"],
         responses= {
             200 : SwaggerResponse.SUCCESS,
@@ -111,6 +113,7 @@ class VerifyEmailView(APIView):
 class ResendOtpView(APIView):
     @extend_schema(
         request=ResendOtpSerializer,
+        summary="Resend New OTP",
         tags=["auth"],
         responses={
             200 : SwaggerResponse.SUCCESS,
@@ -151,6 +154,7 @@ class SignInView(APIView):
 
     @extend_schema(
         request=SingInSerializer,
+        summary="Sing In User",
         tags=["auth"],
         responses={
             200: SwaggerResponse.SUCCESS,
@@ -201,6 +205,7 @@ class SignOutView(APIView):
     permission_classes = [IsAuthenticated]
     @extend_schema(
         request=RefreshTokenSerializer,
+        summary="Sign Out User",
         tags=["auth"],
         responses={
             200 : SwaggerResponse.SUCCESS,
@@ -230,6 +235,7 @@ class MyTokenRefreshView(APIView):
     @extend_schema(
         description="Refreshes an expired access token using the refresh token.",
         parameters=None,
+        summary="Send New Access Token",
         tags=["token"],
         responses={
             200 : SwaggerResponse.SUCCESS,
@@ -261,7 +267,10 @@ class MyTokenRefreshView(APIView):
 
 
 class MyTokenVerifyView(TokenVerifyView):
-    @extend_schema(tags=["token"])
+    @extend_schema(
+        tags=["token"],
+        summary="Check Access Token",
+        )
     def post(self, *args, **kwargs):
         return super().post(*args, **kwargs)
 
