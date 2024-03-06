@@ -1,6 +1,5 @@
 from django.urls import path, include , re_path
-from .views import ( SignUpView , SignInView, SignOutView , VerifyEmailView ,
-ResendOtpView , MyTokenRefreshView , MyTokenVerifyView)
+from .views import  SignUpView , SignInView, SignOutView , VerifyEmailView ,ResendOtpView
 
 
 urlpatterns = [

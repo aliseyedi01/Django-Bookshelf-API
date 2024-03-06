@@ -228,11 +228,31 @@ class SignOutView(APIView):
 
 class MyTokenRefreshView(TokenRefreshView):
     @extend_schema(tags=["token"])
-    def post(self, *args, **kwargs):
-        return super().post(*args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+
+        if response.status_code == 200:
+            access_token = response.data.get('access')
+            return Response({
+                "message": "New access token generated successfully",
+                "data": {"access_token": access_token}
+            }, status=200)
+        return response
+
+    def handle_exception(self, exc):
+        response = super().handle_exception(exc)
+        if response.status_code >= 400:
+            return Response({"error": response.data}, status=response.status_code)
+        return response
 
 
 class MyTokenVerifyView(TokenVerifyView):
     @extend_schema(tags=["token"])
     def post(self, *args, **kwargs):
         return super().post(*args, **kwargs)
+
+    def handle_exception(self, exc):
+        response = super().handle_exception(exc)
+        if response.status_code >= 400:
+            return Response({"error": response.data}, status=response.status_code)
+        return response
