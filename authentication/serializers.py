@@ -137,5 +137,10 @@ class SingInSerializer(BaseCustomSerializer,serializers.ModelSerializer):
         return data
 
 
-class RefreshTokenSerializer(serializers.Serializer):
-    refresh_token = serializers.CharField(max_length=255)
+class RefreshTokenSerializer(BaseCustomSerializer,serializers.Serializer):
+    refresh_token = serializers.CharField(max_length=512, required=True)
+
+    def validate_refresh_token(self, value):
+        if not value:
+            raise serializers.ValidationError("Refresh token is required")
+        return value

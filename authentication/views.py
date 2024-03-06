@@ -209,8 +209,9 @@ class SignOutView(APIView):
         }
     )
     def post(self, request):
-        refresh_token = request.data["refresh_token"]
-        if refresh_token:
+        serializer = RefreshTokenSerializer(data=request.data)
+        if serializer.is_valid():
+            refresh_token = serializer.validated_data['refresh_token']
             try:
                 token = RefreshToken(refresh_token)
                 token.blacklist()
@@ -222,10 +223,7 @@ class SignOutView(APIView):
                 return Response({
                     'error': f"Failed to sign out: {str(e)}"
                     }, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({
-                'error': 'Refresh token is required'
-                }, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MyTokenRefreshView(TokenRefreshView):
