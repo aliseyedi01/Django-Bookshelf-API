@@ -5,7 +5,14 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from rest_framework import permissions
 from authentication.views import MyTokenRefreshView , MyTokenVerifyView
 # Swagger
-from drf_spectacular.views import SpectacularRedocView,SpectacularSwaggerView
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
+
+
+
 
 
 urlpatterns = [
@@ -16,6 +23,7 @@ urlpatterns = [
     path('token/verify/', MyTokenVerifyView.as_view(), name='token_verify'),
     path("swagger/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
     path("redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+    path("schema/", SpectacularAPIView.as_view(), name="schema"),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
