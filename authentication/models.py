@@ -36,6 +36,9 @@ class User(models.Model):
     def check_password(self, password):
         return check_password(password, self.password)
 
+
+
+
 class OtpToken(models.Model):
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=150, unique=True)
