@@ -14,6 +14,22 @@ class User(models.Model):
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+
+    USERNAME_FIELD = "id"
+    REQUIRED_FIELDS = ["email", "username"]
+
+    @property
+    def is_anonymous(self):
+        return True
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_active(self):
+        return True
+
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
