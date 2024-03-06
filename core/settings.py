@@ -35,7 +35,8 @@ INSTALLED_APPS = [
     'drf_spectacular',
     # My Apps
     'books',
-    'authentication'
+    'authentication',
+    'categories'
 ]
 
 # ALLOWED_HOSTS = ['*']
