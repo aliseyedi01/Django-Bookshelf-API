@@ -246,7 +246,6 @@ class MyTokenRefreshView(APIView):
             access_token = str(refresh_token_obj.access_token)
         except TokenError as e:
             if "blacklisted" in str(e):
-                print('error', str(e))
                 return Response({"error": "You are logged out. Please sign in again."}, status=400)
             else:
                 return Response({"error": "Your session has expired. Please sign in again"}, status=400)
