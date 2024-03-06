@@ -18,7 +18,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny , IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken , TokenError
 # apps
 from .serializers import SingUpSerializer , ResendOtpSerializer , SingInSerializer , VerifyEmailSerializer , RefreshTokenSerializer
 from .models import User , OtpToken
@@ -226,24 +226,39 @@ class SignOutView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class MyTokenRefreshView(TokenRefreshView):
-    @extend_schema(tags=["token"])
+class MyTokenRefreshView(APIView):
+    @extend_schema(
+        description="Refreshes an expired access token using the refresh token.",
+        parameters=None,
+        tags=["token"],
+        responses={
+            200 : SwaggerResponse.SUCCESS,
+            400 : SwaggerResponse.BAD_REQUEST,
+        }
+    )
     def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
+        refresh_token = request.COOKIES.get("refresh_token")
+        if not refresh_token:
+            return Response({"error": "Refresh token not found in cookies"}, status=400)
 
-        if response.status_code == 200:
-            access_token = response.data.get('access')
-            return Response({
-                "message": "New access token generated successfully",
-                "data": {"access_token": access_token}
-            }, status=200)
-        return response
+        try:
+            refresh_token_obj = RefreshToken(refresh_token)
+            access_token = str(refresh_token_obj.access_token)
+        except TokenError as e:
+            if "blacklisted" in str(e):
+                print('error', str(e))
+                return Response({"error": "You are logged out. Please sign in again."}, status=400)
+            else:
+                return Response({"error": "Your session has expired. Please sign in again"}, status=400)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
 
-    def handle_exception(self, exc):
-        response = super().handle_exception(exc)
-        if response.status_code >= 400:
-            return Response({"error": response.data}, status=response.status_code)
-        return response
+        return Response({
+            "message": "New access token generated successfully",
+            "data": {"access_token": access_token}
+        }, status=200)
+
+
 
 
 class MyTokenVerifyView(TokenVerifyView):
