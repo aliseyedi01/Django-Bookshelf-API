@@ -20,12 +20,12 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny , IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 # apps
-from .serializers import SingUpSerializer , ResendOtpSerializer , SingInSerializer , VerifyEmailSerializer
+from .serializers import SingUpSerializer , ResendOtpSerializer , SingInSerializer , VerifyEmailSerializer , RefreshTokenSerializer
 from .models import User , OtpToken
 from .tokens import get_tokens_for_user
 from .utils import generate_and_send_otp , SwaggerResponse
 # swagger
-from drf_spectacular.utils import extend_schema , OpenApiExample , OpenApiResponse
+from drf_spectacular.utils import extend_schema , OpenApiExample , OpenApiResponse , OpenApiParameter
 from rest_framework_simplejwt.views import TokenRefreshView ,TokenVerifyView
 
 
@@ -200,6 +200,7 @@ class SignInView(APIView):
 class SignOutView(APIView):
     permission_classes = [IsAuthenticated]
     @extend_schema(
+        request=RefreshTokenSerializer,
         tags=["auth"],
         responses={
             200 : SwaggerResponse.SUCCESS,

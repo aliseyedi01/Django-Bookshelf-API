@@ -135,3 +135,7 @@ class SingInSerializer(BaseCustomSerializer,serializers.ModelSerializer):
         if not user or not user.check_password(password):
             raise serializers.ValidationError("Invalid credentials.")
         return data
+
+
+class RefreshTokenSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField(max_length=255)
