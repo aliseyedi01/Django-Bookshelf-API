@@ -20,16 +20,22 @@ class BookListView(APIView):
             OpenApiParameter(
                 name='is_read',
                 required=False,
-                description='use "true" to retrieve read books(/books/?is_read=true)',
+                description='Use "true" to retrieve read books(/books/?is_read=true)',
                 type=bool,
                 enum=['true', 'false']
             ),
             OpenApiParameter(
                 name='is_favorite',
                 required=False,
-                description='use "true" to retrieve favorite books (/books/?is_favorite=true)',
+                description='Use "true" to retrieve favorite books (/books/?is_favorite=true)',
                 type=bool,
                 enum=['true', 'false']
+            ),
+            OpenApiParameter(
+                name='title',
+                required=False,
+                description='Search books by book title (/books/?search=sport).',
+                type=str,
             )
         ],
        description="Use query parameters to filter the books. Both parameters are optional. If only one is provided, it will filter based on that criterion only."
@@ -37,6 +43,7 @@ class BookListView(APIView):
     def get(self, request):
         is_read = request.query_params.get('is_read', None)
         is_favorite = request.query_params.get('is_favorite', None)
+        title = request.query_params.get('title', None)
 
         queryset = Book.objects.all()
 
@@ -45,6 +52,9 @@ class BookListView(APIView):
 
         if is_favorite is not None:
             queryset = queryset.filter(is_favorite=is_favorite)
+
+        if title:
+            queryset = queryset.filter(title__icontains=title)
 
         serializer = BookSerializer(queryset, many=True)
 
