@@ -8,6 +8,7 @@ from rest_framework import status
 # apps
 from .models import Book
 from .serializers import BookSerializer
+from categories.models import Category
 # swagger
 from drf_spectacular.utils import OpenApiExample, extend_schema , OpenApiParameter
 
@@ -36,6 +37,12 @@ class BookListView(APIView):
                 required=False,
                 description='Search books by book title (/books/?search=sport).',
                 type=str,
+            ),
+            OpenApiParameter(
+                name='category',
+                required=False,
+                description='Filter books by category name (/books/?category=romance).',
+                type=str,
             )
         ],
        description="Use query parameters to filter the books. Both parameters are optional. If only one is provided, it will filter based on that criterion only."
@@ -44,6 +51,7 @@ class BookListView(APIView):
         is_read = request.query_params.get('is_read', None)
         is_favorite = request.query_params.get('is_favorite', None)
         title = request.query_params.get('title', None)
+        category_name = request.query_params.get('category')
 
         queryset = Book.objects.all()
 
@@ -55,6 +63,17 @@ class BookListView(APIView):
 
         if title:
             queryset = queryset.filter(title__icontains=title)
+
+        if category_name:
+            try:
+                category = Category.objects.get(name=category_name)
+            except Category.DoesNotExist:
+                return Response({
+                    "error": f"Category '{category_name}' does not exist."
+                    },status=status.HTTP_404_NOT_FOUND)
+
+            queryset = queryset.filter(category=category.id)
+
 
         serializer = BookSerializer(queryset, many=True)
 
