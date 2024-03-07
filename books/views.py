@@ -35,7 +35,7 @@ class BookListView(APIView):
             OpenApiParameter(
                 name='title',
                 required=False,
-                description='Search books by book title (/books/?search=sport).',
+                description='Search books by book title (/books/?title=sport).',
                 type=str,
             ),
             OpenApiParameter(
