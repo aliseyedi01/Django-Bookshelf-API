@@ -27,7 +27,6 @@ class CreateBookSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f"Category: {value} does not exist.")
 
     def create(self, validated_data):
-        print('category' , validated_data)
         category_name = validated_data.pop('category')
         category = self.validate_category_name(category_name)
         validated_data['category'] = category

@@ -17,7 +17,7 @@ class BookListView(APIView):
     permission_classes = [IsAuthenticated]
     @extend_schema(
         responses=BookSerializer,
-        summary="Get a filtered book",
+        summary="Get filtered books",
         parameters=[
             OpenApiParameter(
                 name='is_read',
@@ -98,7 +98,8 @@ class BookListView(APIView):
         if serializer.is_valid():
 
             book = serializer.save(user=request.user)
-            serialized_book = CreateBookSerializer(book)
+            serializer  = BookSerializer(book, many=True)
+            serialized_book = BookSerializer(book)
 
             return Response({
                 "message": "Book created successfully",
