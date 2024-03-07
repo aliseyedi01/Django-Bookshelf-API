@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 # apps
 from .models import Book
-from .serializers import BookSerializer
+from .serializers import BookSerializer , CreateBookSerializer
 from categories.models import Category
 # swagger
 from drf_spectacular.utils import OpenApiExample, extend_schema , OpenApiParameter
@@ -17,6 +17,7 @@ class BookListView(APIView):
     permission_classes = [IsAuthenticated]
     @extend_schema(
         responses=BookSerializer,
+        summary="Get a filtered book",
         parameters=[
             OpenApiParameter(
                 name='is_read',
@@ -83,4 +84,28 @@ class BookListView(APIView):
                 "data": serializer.data,
             },
             status=status.HTTP_200_OK,
+        )
+
+
+    @extend_schema(
+        request=CreateBookSerializer,
+        summary="Create a new book",
+        description="Create a new book by providing the required information.",
+        responses=CreateBookSerializer
+    )
+    def post(self, request):
+        serializer = CreateBookSerializer(data=request.data)
+        if serializer.is_valid():
+
+            book = serializer.save(user=request.user)
+            serialized_book = CreateBookSerializer(book)
+
+            return Response({
+                "message": "Book created successfully",
+                "data": serialized_book.data
+                },status=status.HTTP_201_CREATED
+            )
+        return Response(
+            { "error" : serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST
         )
