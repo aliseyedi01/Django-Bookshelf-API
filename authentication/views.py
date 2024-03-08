@@ -261,6 +261,7 @@ class MyTokenRefreshView(APIView):
     )
     def get(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get("refresh_token")
+        print('refresh token', refresh_token)
         if not refresh_token:
             return Response({"error": "Refresh token not found in cookies"}, status=400)
 
