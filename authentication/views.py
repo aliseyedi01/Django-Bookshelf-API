@@ -200,6 +200,7 @@ class SignInView(APIView):
                 secure=True,
                 samesite='Lax',
                 domain='.library-api-t70g.onrender.com',
+                path="/",
                 httponly=True)
             response.set_cookie(
                 'refresh_token',
@@ -208,6 +209,7 @@ class SignInView(APIView):
                 secure=True,
                 samesite='Lax',
                 domain='.library-api-t70g.onrender.com',
+                path="/",
                 httponly=True)
 
             return response
