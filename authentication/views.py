@@ -202,6 +202,7 @@ class SignInView(APIView):
                 domain='.library-api-t70g.onrender.com',
                 path="/",
                 httponly=True)
+
             response.set_cookie(
                 'refresh_token',
                 value=tokens['refresh_token'],
@@ -257,13 +258,14 @@ class MyTokenRefreshView(APIView):
         responses={
             200 : SwaggerResponse.SUCCESS,
             400 : SwaggerResponse.BAD_REQUEST,
-        }
+        },
+        request=RefreshTokenSerializer,
     )
-    def get(self, request, *args, **kwargs):
-        refresh_token = request.COOKIES.get("refresh_token")
-        print('refresh token', refresh_token)
-        if not refresh_token:
-            return Response({"error": "Refresh token not found in cookies"}, status=400)
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get("refresh_token") or request.data.get("refresh_token")
+
+        if refresh_token is None:
+             return Response({"error": "Refresh token not found"}, status=400)
 
         try:
             refresh_token_obj = RefreshToken(refresh_token)
