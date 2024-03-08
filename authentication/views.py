@@ -13,6 +13,7 @@ from django.db.models import Q
 from django.core.cache import cache
 from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
+from django.utils import timezone
 # drf
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -24,6 +25,7 @@ from .serializers import SingUpSerializer , ResendOtpSerializer , SingInSerializ
 from .models import User , OtpToken
 from .tokens import get_tokens_for_user
 from .utils import generate_and_send_otp , SwaggerResponse
+from datetime import datetime, timedelta
 # swagger
 from drf_spectacular.utils import extend_schema , OpenApiExample , OpenApiResponse , OpenApiParameter
 from rest_framework_simplejwt.views import TokenRefreshView ,TokenVerifyView
@@ -183,17 +185,32 @@ class SignInView(APIView):
 
             tokens = get_tokens_for_user(user)
 
-            # Set tokens in cookies
+            access_token_expire = datetime.utcnow() + timedelta(hours=12)
+            refresh_token_expire = datetime.utcnow() + timedelta(days=4)
+
             response = JsonResponse({
                 'message': 'Successfully signed in',
                 'data': tokens
             })
 
-            # Set access token in a cookie
-            response.set_cookie('access_token', tokens['access_token'], httponly=True)
-
-            # Set refresh token in a cookie
-            response.set_cookie('refresh_token', tokens['refresh_token'], httponly=True)
+            response.set_cookie(
+                key='access_token',
+                value=tokens['access_token'],
+                expires=access_token_expire ,
+                # max_age=12*60*60,
+                secure=True,
+                samesite='Lax',
+                domain='warm-yeot-5f210e.netlify.app',
+                httponly=True)
+            response.set_cookie(
+                key='refresh_token',
+                value=tokens['refresh_token'],
+                # max_age=4*24*60*60,
+                expires=refresh_token_expire ,
+                secure=True,
+                samesite='Lax',
+                domain='warm-yeot-5f210e.netlify.app',
+                httponly=True)
 
             return response
 
