@@ -194,22 +194,22 @@ class SignInView(APIView):
             })
 
             response.set_cookie(
-                key='access_token',
+                'access_token',
                 value=tokens['access_token'],
                 expires=access_token_expire ,
-                # max_age=12*60*60,
                 secure=True,
                 samesite='Lax',
                 domain='.warm-yeot-5f210e.netlify.app',
+                path="/",
                 httponly=True)
             response.set_cookie(
-                key='refresh_token',
+                'refresh_token',
                 value=tokens['refresh_token'],
-                # max_age=4*24*60*60,
                 expires=refresh_token_expire ,
                 secure=True,
                 samesite='Lax',
                 domain='.warm-yeot-5f210e.netlify.app',
+                path="/",
                 httponly=True)
 
             return response
