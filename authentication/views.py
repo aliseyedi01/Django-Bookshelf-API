@@ -252,14 +252,14 @@ class MyTokenRefreshView(APIView):
     @extend_schema(
         description="Refreshes an expired access token using the refresh token.",
         parameters=None,
-        summary="Send New Access Token",
+        summary="Get New Access Token",
         tags=["token"],
         responses={
             200 : SwaggerResponse.SUCCESS,
             400 : SwaggerResponse.BAD_REQUEST,
         }
     )
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get("refresh_token")
         if not refresh_token:
             return Response({"error": "Refresh token not found in cookies"}, status=400)
