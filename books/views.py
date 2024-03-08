@@ -9,9 +9,10 @@ from rest_framework import status
 from .models import Book
 from .serializers import BookSerializer , CreateBookSerializer
 from categories.models import Category
+from .utils import upload_to_supabase
 # swagger
 from drf_spectacular.utils import OpenApiExample, extend_schema , OpenApiParameter
-
+from django.views.decorators.csrf import csrf_exempt
 
 class BookListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -93,9 +94,22 @@ class BookListView(APIView):
         description="Create a new book by providing the required information.",
         responses=CreateBookSerializer
     )
+    # @csrf_exempt
     def post(self, request):
         serializer = CreateBookSerializer(data=request.data)
         if serializer.is_valid():
+            image = request.FILES.get('image_url')
+            username = request.user.username
+            title = serializer.validated_data['title']
+
+            if not image:
+                return Response({
+                    "error": "No image file uploaded."
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            if image:
+                supabase_image_url = upload_to_supabase(image,username,title)
+                serializer.validated_data['image_url'] = supabase_image_url
 
             book = serializer.save(user=request.user)
             serializer  = BookSerializer(book, many=True)

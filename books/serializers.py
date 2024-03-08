@@ -2,6 +2,9 @@ from rest_framework import serializers
 from .models import Book
 from categories.models import Category
 from categories.serializers import CategorySerializer
+from .utils import upload_to_supabase
+from authentication.serializers import BaseCustomSerializer
+
 
 class BookSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
@@ -12,8 +15,9 @@ class BookSerializer(serializers.ModelSerializer):
 
 
 
-class CreateBookSerializer(serializers.ModelSerializer):
+class CreateBookSerializer(BaseCustomSerializer,serializers.ModelSerializer):
     category_name = serializers.CharField(source='category', write_only=True)
+    image_url = serializers.ImageField(write_only=True)
 
     class Meta:
         model = Book
@@ -30,4 +34,5 @@ class CreateBookSerializer(serializers.ModelSerializer):
         category_name = validated_data.pop('category')
         category = self.validate_category_name(category_name)
         validated_data['category'] = category
+
         return super().create(validated_data)
