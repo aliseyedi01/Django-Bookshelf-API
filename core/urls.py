@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 # drf
 from rest_framework import permissions
-from authentication.views import MyTokenRefreshView , MyTokenVerifyView
+from authentication.views import MyTokenRefreshView, MyTokenVerifyView
 # Swagger
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -12,14 +12,12 @@ from drf_spectacular.views import (
 )
 
 
-
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('book/', include('books.urls')),
     path('auth/', include('authentication.urls')),
     path('profile/', include('accounts.urls')),
+    path('category/', include('categories.urls')),
     path('token/refresh/', MyTokenRefreshView.as_view(), name='token_refresh',),
     path('token/verify/', MyTokenVerifyView.as_view(), name='token_verify'),
     path("swagger/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
@@ -28,5 +26,3 @@ urlpatterns = [
 ]
 
 urlpatterns += staticfiles_urlpatterns()
-
-
