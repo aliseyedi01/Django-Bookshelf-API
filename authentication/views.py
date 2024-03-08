@@ -200,7 +200,7 @@ class SignInView(APIView):
                 secure=True,
                 samesite='Lax',
                 domain='.warm-yeot-5f210e.netlify.app',
-                path="/",
+                path="/login",
                 httponly=True)
             response.set_cookie(
                 'refresh_token',
@@ -209,7 +209,7 @@ class SignInView(APIView):
                 secure=True,
                 samesite='Lax',
                 domain='.warm-yeot-5f210e.netlify.app',
-                path="/",
+                path="/login",
                 httponly=True)
 
             return response
