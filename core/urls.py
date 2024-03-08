@@ -19,6 +19,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('book/', include('books.urls')),
     path('auth/', include('authentication.urls')),
+    path('profile/', include('accounts.urls')),
     path('token/refresh/', MyTokenRefreshView.as_view(), name='token_refresh',),
     path('token/verify/', MyTokenVerifyView.as_view(), name='token_verify'),
     path("swagger/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
