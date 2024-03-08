@@ -200,7 +200,7 @@ class SignInView(APIView):
                 # max_age=12*60*60,
                 secure=True,
                 samesite='Lax',
-                domain='warm-yeot-5f210e.netlify.app',
+                domain='.warm-yeot-5f210e.netlify.app',
                 httponly=True)
             response.set_cookie(
                 key='refresh_token',
@@ -209,7 +209,7 @@ class SignInView(APIView):
                 expires=refresh_token_expire ,
                 secure=True,
                 samesite='Lax',
-                domain='warm-yeot-5f210e.netlify.app',
+                domain='.warm-yeot-5f210e.netlify.app',
                 httponly=True)
 
             return response
