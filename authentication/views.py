@@ -14,7 +14,6 @@ from django.core.cache import cache
 from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 from django.utils import timezone
-from django.contrib.sites.shortcuts import get_current_site
 # drf
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -194,17 +193,13 @@ class SignInView(APIView):
                 'data': tokens
             })
 
-            current_site = get_current_site(request).domain
-            print('current site' ,current_site)
-
             response.set_cookie(
                 'access_token',
                 value=tokens['access_token'],
                 expires=access_token_expire ,
                 secure=True,
                 samesite='Lax',
-                domain='warm-yeot-5f210e.netlify.app',
-                # path="/",
+                domain='.library-api-t70g.onrender.com',
                 httponly=True)
             response.set_cookie(
                 'refresh_token',
@@ -212,8 +207,7 @@ class SignInView(APIView):
                 expires=refresh_token_expire ,
                 secure=True,
                 samesite='Lax',
-                domain='warm-yeot-5f210e.netlify.app',
-                # path="/",
+                domain='.library-api-t70g.onrender.com',
                 httponly=True)
 
             return response
