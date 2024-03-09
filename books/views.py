@@ -138,3 +138,15 @@ class BookDetailView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+    def delete(self, request, pk):
+        book = Book.objects.filter(pk=pk, user=request.user).first()
+        if not book:
+            raise NotFound({'error': f"Book with ID: {pk} not found for current user"})
+
+        book.delete()
+
+        return Response(
+            {"message": "Book deleted successfully"},
+            status=status.HTTP_204_NO_CONTENT
+        )
