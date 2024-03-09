@@ -11,6 +11,7 @@ from rest_framework.exceptions import NotFound
 # app
 from .models import Category
 from .serializers import CategorySerializer, CategoryDetailSerializer
+from books.models import Book
 # swagger
 from drf_spectacular.utils import OpenApiExample, extend_schema
 
@@ -110,6 +111,13 @@ class CategoryDetailView(APIView):
         category = Category.objects.filter(pk=pk, user=request.user).first()
         if not category:
             raise NotFound({'error': f"Category with ID: {pk} not found."})
+
+        if Book.objects.filter(category=category, user=request.user).exists():
+            return Response(
+                {"error": "This category is being used in one or more books. Remove the association before deleting the category."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         category.delete()
         return Response({
             "message":  "Category deleted successfully"},
