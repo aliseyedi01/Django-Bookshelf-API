@@ -1,12 +1,14 @@
-from .models import OtpToken,User
+from .models import OtpToken, User
 from django.core.mail import send_mail
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiResponse
 
+
 def generate_and_send_otp(user):
     username = user['username']
     email = user['email']
-    otp = OtpToken.objects.create(username=username, expires_at=timezone.now() + timezone.timedelta(seconds=90))
+    otp = OtpToken.objects.create(username=username, expires_at=timezone.now() +
+                                  timezone.timedelta(seconds=90))
     message = f"""
         Hi {username}, here is your OTP {otp.otp_code}
         It expires in 5 minutes, use the URL below to redirect back to the website
@@ -34,3 +36,4 @@ class SwaggerResponse:
     BAD_REQUEST = OpenApiResponse(description="Bad Request")
     INTERNAL_SERVER_ERROR = OpenApiResponse(description="Internal Server Error")
     CREATED = OpenApiResponse(description="Created")
+    NO_CONTENT = OpenApiResponse(description="No Content")

@@ -11,6 +11,7 @@ from .models import Book
 from .serializers import BookSerializer, CreateBookSerializer
 from categories.models import Category
 from .utils import upload_to_supabase
+from authentication.utils import generate_and_send_otp, SwaggerResponse
 # swagger
 from drf_spectacular.utils import OpenApiExample, extend_schema, OpenApiParameter
 from django.views.decorators.csrf import csrf_exempt
@@ -124,6 +125,11 @@ class BookListView(APIView):
 class BookDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        responses=BookSerializer,
+        summary="Get a book",
+        description="Retrieve details of a book by providing its ID.",
+    )
     def get(self, request, pk):
         book = Book.objects.filter(pk=pk, user=request.user).first()
         if not book:
@@ -139,6 +145,46 @@ class BookDetailView(APIView):
             status=status.HTTP_200_OK,
         )
 
+    @extend_schema(
+        request=CreateBookSerializer,
+        responses=BookSerializer,
+        summary="Update a book",
+        description="Update details of a book by providing its ID and new data.",
+    )
+    def patch(self, request, pk):
+        book = Book.objects.filter(pk=pk, user=request.user).first()
+        if not book:
+            raise NotFound({'error': f"Book with ID: {pk} not found."})
+
+        serializer = CreateBookSerializer(instance=book, data=request.data, context={
+            'request': request}, partial=True)
+        if serializer.is_valid():
+            image = request.FILES.get('image_url')
+            if image:
+                username = request.user.username
+                title = serializer.validated_data['title']
+                supabase_image_url = upload_to_supabase(image, username, title)
+                serializer.validated_data['image_url'] = supabase_image_url
+
+            serializer.save()
+            serialized_book = BookSerializer(book)
+            return Response({
+                "message": "Book updated successfully",
+                "data": serialized_book.data
+            }, status=status.HTTP_200_OK)
+        return Response(
+            {"error": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    @extend_schema(
+        summary="Delete a book",
+        description="Delete a book by providing its ID.",
+        responses={
+            204: SwaggerResponse.NO_CONTENT,
+            404: SwaggerResponse.NOT_FOUND
+        },
+    )
     def delete(self, request, pk):
         book = Book.objects.filter(pk=pk, user=request.user).first()
         if not book:
