@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from supabase import create_client, Client
-
+import re
 
 load_dotenv()
 
@@ -12,9 +12,9 @@ key: str = os.getenv('SUPABASE_KEY')
 supabase: Client = create_client(url, key)
 
 
-def upload_to_supabase(image,username,title):
+def upload_to_supabase(image, username, title):
     try:
-        filename = f"{username}-{title}-{image.name}"
+        filename = re.sub(r'\s+', '-', f"{username}-{title}-{image.name}")
 
         file_content = image.read()
 
@@ -30,7 +30,7 @@ def upload_to_supabase(image,username,title):
             raise Exception("Error uploading image: No response received")
 
         if response.status_code != 200:
-                raise Exception(f"{response.status_code}Something went wrong while saving profile picture")
+            raise Exception(f"{response.status_code}Something went wrong while saving profile picture")
 
         public_url = storage.get_public_url(filename)
 
