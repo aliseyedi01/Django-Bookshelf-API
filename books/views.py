@@ -7,15 +7,17 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 # apps
 from .models import Book
-from .serializers import BookSerializer , CreateBookSerializer
+from .serializers import BookSerializer, CreateBookSerializer
 from categories.models import Category
 from .utils import upload_to_supabase
 # swagger
-from drf_spectacular.utils import OpenApiExample, extend_schema , OpenApiParameter
+from drf_spectacular.utils import OpenApiExample, extend_schema, OpenApiParameter
 from django.views.decorators.csrf import csrf_exempt
+
 
 class BookListView(APIView):
     permission_classes = [IsAuthenticated]
+
     @extend_schema(
         responses=BookSerializer,
         summary="Get filtered books",
@@ -47,15 +49,16 @@ class BookListView(APIView):
                 type=str,
             )
         ],
-       description="Use query parameters to filter the books. Both parameters are optional. If only one is provided, it will filter based on that criterion only."
+        description="Use query parameters to filter the books. Both parameters are optional. If only one is provided, it will filter based on that criterion only."
     )
     def get(self, request):
+        user = request.user
         is_read = request.query_params.get('is_read', None)
         is_favorite = request.query_params.get('is_favorite', None)
         title = request.query_params.get('title', None)
-        category_name = request.query_params.get('category')
+        category_name = request.query_params.get('category', None)
 
-        queryset = Book.objects.all()
+        queryset = Book.objects.filter(user=user)
 
         if is_read is not None:
             queryset = queryset.filter(is_read=is_read)
@@ -66,16 +69,8 @@ class BookListView(APIView):
         if title:
             queryset = queryset.filter(title__icontains=title)
 
-        if category_name:
-            try:
-                category = Category.objects.get(name=category_name)
-            except Category.DoesNotExist:
-                return Response({
-                    "error": f"Category '{category_name}' does not exist."
-                    },status=status.HTTP_404_NOT_FOUND)
-
-            queryset = queryset.filter(category=category.id)
-
+        if category_name is not None:
+            queryset = queryset.filter(category=category_name)
 
         serializer = BookSerializer(queryset, many=True)
 
@@ -87,7 +82,6 @@ class BookListView(APIView):
             status=status.HTTP_200_OK,
         )
 
-
     @extend_schema(
         request=CreateBookSerializer,
         summary="Create a new book",
@@ -96,7 +90,7 @@ class BookListView(APIView):
     )
     # @csrf_exempt
     def post(self, request):
-        serializer = CreateBookSerializer(data=request.data)
+        serializer = CreateBookSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             image = request.FILES.get('image_url')
             username = request.user.username
@@ -108,19 +102,19 @@ class BookListView(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             if image:
-                supabase_image_url = upload_to_supabase(image,username,title)
+                supabase_image_url = upload_to_supabase(image, username, title)
                 serializer.validated_data['image_url'] = supabase_image_url
 
             book = serializer.save(user=request.user)
-            serializer  = BookSerializer(book, many=True)
+            serializer = BookSerializer(book, many=True)
             serialized_book = BookSerializer(book)
 
             return Response({
                 "message": "Book created successfully",
                 "data": serialized_book.data
-                },status=status.HTTP_201_CREATED
+            }, status=status.HTTP_201_CREATED
             )
         return Response(
-            { "error" : serializer.errors},
+            {"error": serializer.errors},
             status=status.HTTP_400_BAD_REQUEST
         )
