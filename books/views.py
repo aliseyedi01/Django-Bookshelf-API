@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from rest_framework.exceptions import NotFound
 # apps
 from .models import Book
 from .serializers import BookSerializer, CreateBookSerializer
@@ -117,4 +118,23 @@ class BookListView(APIView):
         return Response(
             {"error": serializer.errors},
             status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class BookDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        book = Book.objects.filter(pk=pk, user=request.user).first()
+        if not book:
+            raise NotFound({'error': f"Book with ID: {pk} not found for current user"})
+
+        serializer = BookSerializer(book)
+
+        return Response(
+            {
+                "message": "Category retrieved successfully",
+                "data": serializer.data,
+            },
+            status=status.HTTP_200_OK,
         )
