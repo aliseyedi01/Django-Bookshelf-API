@@ -24,3 +24,9 @@ class CategoryDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name']
+
+    def validate_name(self, value):
+        user = self.context['request'].user
+        if Category.objects.filter(name=value, user=user).exists():
+            raise serializers.ValidationError("A category with this name already exists for the user.")
+        return value

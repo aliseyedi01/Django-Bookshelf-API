@@ -90,7 +90,7 @@ class CategoryDetailView(APIView):
         if not category:
             raise NotFound({'error': f"Category with ID: {pk} not found."})
 
-        serializer = CategoryDetailSerializer(category, data=request.data)
+        serializer = CategoryDetailSerializer(category, data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(
