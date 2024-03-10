@@ -6,18 +6,18 @@ A Bookshelf API implemented with Django and FastAPI
 
 - [Bookshelf API with Django \& DRF](#bookshelf-api-with-django--drf)
   - [📚 Contents](#-contents)
-  - [📚 Demo  🔝](#-demo--)
-  - [✨ Features 🔝](#-features-)
-  - [🔧 Technologies Used 🔝](#-technologies-used-)
-  - [🚀 API Endpoints 🔝](#-api-endpoints-)
-  - [🗃️ Database  🔝](#️-database--)
-  - [🛠️ Installation 🔝](#️-installation-)
-  - [🖥️ Usage 🔝](#️-usage-)
-  - [🤝 Contributing 🔝](#-contributing-)
-  - [📝 License 🔝](#-license-)
+  - [📚 Demo](#-demo)
+  - [✨ Features](#-features)
+  - [🔧 Technologies Used](#-technologies-used)
+  - [🚀 API Endpoints](#-api-endpoints)
+  - [🗃️ Database](#️-database)
+  - [🛠️ Installation](#️-installation)
+  - [🖥️ Usage](#️-usage)
+  - [🤝 Contributing](#-contributing)
+  - [📝 License](#-license)
 
 
-## 📚 Demo  [🔝](#-contents)
+## 📚 Demo
 
 > [!TIP]
 >  The Render.com free plan may experience a short delay (approximately 1 minute) when starting up. Please be patient for the initial access.
@@ -31,7 +31,7 @@ A Bookshelf API implemented with Django and FastAPI
 - **Database**
 	- [dbdiagram](https://dbdiagram.io/d/library-65e177d0cd45b569fb458e75)
 
-## ✨ Features [🔝](#-contents)
+## ✨ Features
 
 - **Book Endpoints:**
 	- Comprehensive CRUD operations for managing book details, covering creation, retrieval, updating, and deletion.
@@ -46,7 +46,7 @@ A Bookshelf API implemented with Django and FastAPI
 - **Swagger:**
 	- Seamless integration of Swagger UI or ReDoc for comprehensive API documentation. This ensures developers have clear and accessible documentation to understand and utilize the API effectively.
 
-## 🔧 Technologies Used [🔝](#-contents)
+## 🔧 Technologies Used
 
 - **Django:** 
 	- A high-level Python web framework that encourages rapid development and clean, pragmatic design.
@@ -63,16 +63,16 @@ A Bookshelf API implemented with Django and FastAPI
 - **Django Rest Framework (DRF):** 
 	- A powerful toolkit for building Web APIs in Django, used for creating RESTful endpoints for book management.
 
-## 🚀 API Endpoints [🔝](#-contents)
+## 🚀 API Endpoints
 
 ![image](https://github.com/aliseyedi01/Library_Api/assets/118107025/52cb714a-2297-4eb6-973b-c66abc9a618d)
 
-## 🗃️ Database  [🔝](#-contents)
+## 🗃️ Database
 
 
 ![image](https://github.com/aliseyedi01/Library_Api/assets/118107025/2719d623-8a2b-43d8-a743-aad32d5c5b7f)
 
-## 🛠️ Installation [🔝](#-contents)
+## 🛠️ Installation
 
 1. **Clone the repository:**
 
@@ -112,7 +112,7 @@ git clone https://github.com/aliseyedi01/Django-Bookshelf-API.git
    pip install -r requirements.txt
    ```
 
-## 🖥️ Usage [🔝](#-contents)
+## 🖥️ Usage
 
 1. **Run Django migrations:**
 
@@ -135,11 +135,11 @@ git clone https://github.com/aliseyedi01/Django-Bookshelf-API.git
    - Swagger UI: [http://127.0.0.1:8000/swagger/](http://127.0.0.1:8000/swagger/)
    - ReDoc: [http://127.0.0.1:8000/redoc/](http://127.0.0.1:8000/redoc/)
 
-## 🤝 Contributing [🔝](#-contents)
+## 🤝 Contributing
 
 Feel free to contribute to the project. Fork the repository, make changes, and submit a pull request.
 
-## 📝 License [🔝](#-contents)
+## 📝 License
 
 This project is licensed under the [MIT License](LICENSE).
 
