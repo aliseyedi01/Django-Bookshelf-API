@@ -10,7 +10,7 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound
 # app
 from .models import Category
-from .serializers import CategorySerializer, CategoryDetailSerializer
+from .serializers import CategorySerializer, CategoryDetailSerializer, CategoryCreateSerializer
 from books.models import Book
 # swagger
 from drf_spectacular.utils import OpenApiExample, extend_schema
@@ -44,7 +44,7 @@ class CategoryListView(APIView):
         responses={201: CategorySerializer}
     )
     def post(self, request):
-        serializer = CategorySerializer(data=request.data, context={'request': request})
+        serializer = CategoryCreateSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response({
