@@ -8,7 +8,7 @@ class Book(models.Model):
     title = models.CharField(max_length=50)
     author = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
-    image_url = models.URLField(max_length=2000)
+    image_url = models.URLField(max_length=2000, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='books')
     category = models.CharField(max_length=50)
 

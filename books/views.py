@@ -98,14 +98,12 @@ class BookListView(APIView):
             username = request.user.username
             title = serializer.validated_data['title']
 
-            if not image:
-                return Response({
-                    "error": "No image file uploaded."
-                }, status=status.HTTP_400_BAD_REQUEST)
-
             if image:
                 supabase_image_url = upload_to_supabase(image, username, title)
                 serializer.validated_data['image_url'] = supabase_image_url
+            else:
+                # Set image_url to an empty string if not provided
+                serializer.validated_data['image_url'] = ''
 
             book = serializer.save(user=request.user)
             serializer = BookSerializer(book, many=True)

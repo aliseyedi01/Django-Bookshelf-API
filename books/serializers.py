@@ -16,7 +16,7 @@ class BookSerializer(serializers.ModelSerializer):
 
 class CreateBookSerializer(BaseCustomSerializer, serializers.ModelSerializer):
     category_name = serializers.CharField(source='category', write_only=True)
-    image_url = serializers.ImageField(write_only=True)
+    image_url = serializers.ImageField(write_only=True, required=False, allow_null=True)
 
     class Meta:
         model = Book
