@@ -95,14 +95,13 @@ class BookListView(APIView):
         serializer = CreateBookSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             image = request.FILES.get('image_url')
-            username = request.user.username
-            title = serializer.validated_data['title']
-
             if image:
+                username = request.user.username
+                title = serializer.validated_data['title']
                 supabase_image_url = upload_to_supabase(image, username, title)
                 serializer.validated_data['image_url'] = supabase_image_url
             else:
-                # Set image_url to an empty string if not provided
+                # If image is not provided, set image_url to an empty string
                 serializer.validated_data['image_url'] = ''
 
             book = serializer.save(user=request.user)
@@ -163,6 +162,9 @@ class BookDetailView(APIView):
                 title = serializer.validated_data['title']
                 supabase_image_url = upload_to_supabase(image, username, title)
                 serializer.validated_data['image_url'] = supabase_image_url
+            else:
+                # If image is not provided, set image_url to an empty string
+                serializer.validated_data['image_url'] = ''
 
             serializer.save()
             serialized_book = BookSerializer(book)

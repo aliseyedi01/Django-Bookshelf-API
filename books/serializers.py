@@ -26,12 +26,16 @@ class CreateBookSerializer(BaseCustomSerializer, serializers.ModelSerializer):
         user = self.context['request'].user
         try:
             category = Category.objects.get(name=value, user=user)
-            return category
+            return category.name
         except Category.DoesNotExist:
             raise serializers.ValidationError(f"Category: {value} does not exist for the current user.")
 
     def validate_title(self, value):
         user = self.context['request'].user
+
+        if self.instance and self.instance.title == value:
+            return value
+
         if Book.objects.filter(title=value, user=user).exists():
             raise serializers.ValidationError(
                 f"A book with the title '{value}' already exists for the current user.")
