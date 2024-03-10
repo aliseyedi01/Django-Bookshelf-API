@@ -202,7 +202,7 @@ SPECTACULAR_SETTINGS = {
     'LICENSE': {'name': "BSD License"},
     "COMPONENT_SPLIT_REQUEST": True,
     'TAGS': [
-        {'name': 'authentication'},
+        {'name': 'auth'},
         {'name': 'token'}
     ],
 }
