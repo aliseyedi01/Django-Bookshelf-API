@@ -8,13 +8,13 @@ A Bookshelf API implemented with Django and FastAPI
   - [📚 Contents](#-contents)
   - [📚 Demo](#-demo)
   - [✨ Features 🔝](#-features-)
-  - [🔧 Technologies Used](#-technologies-used)
-  - [🚀 API Endpoints](#-api-endpoints)
+  - [🔧 Technologies Used 🔝](#-technologies-used-)
+  - [🚀 API Endpoints 🔝](#-api-endpoints-)
   - [🗃️ Database](#️-database)
-  - [🛠️ Installation](#️-installation)
-  - [🖥️ Usage](#️-usage)
-  - [🤝 Contributing](#-contributing)
-  - [📝 License](#-license)
+  - [🛠️ Installation 🔝](#️-installation-)
+  - [🖥️ Usage 🔝](#️-usage-)
+  - [🤝 Contributing 🔝](#-contributing-)
+  - [📝 License 🔝](#-license-)
 
 
 ## 📚 Demo
@@ -45,7 +45,7 @@ A Bookshelf API implemented with Django and FastAPI
 - **Swagger:**
 	- Seamless integration of Swagger UI or ReDoc for comprehensive API documentation. This ensures developers have clear and accessible documentation to understand and utilize the API effectively.
 
-## 🔧 Technologies Used
+## 🔧 Technologies Used [🔝](#-contents)
 
 - **Django:** 
 	- A high-level Python web framework that encourages rapid development and clean, pragmatic design.
@@ -62,7 +62,7 @@ A Bookshelf API implemented with Django and FastAPI
 - **Django Rest Framework (DRF):** 
 	- A powerful toolkit for building Web APIs in Django, used for creating RESTful endpoints for book management.
 
-## 🚀 API Endpoints
+## 🚀 API Endpoints [🔝](#-contents)
 
 ![image](https://github.com/aliseyedi01/Library_Api/assets/118107025/52cb714a-2297-4eb6-973b-c66abc9a618d)
 
@@ -70,7 +70,7 @@ A Bookshelf API implemented with Django and FastAPI
 
 ![image](https://github.com/aliseyedi01/Library_Api/assets/118107025/2719d623-8a2b-43d8-a743-aad32d5c5b7f)
 
-## 🛠️ Installation
+## 🛠️ Installation [🔝](#-contents)
 
 1. **Clone the repository:**
 
@@ -110,7 +110,7 @@ git clone https://github.com/aliseyedi01/Django-Bookshelf-API.git
    pip install -r requirements.txt
    ```
 
-## 🖥️ Usage
+## 🖥️ Usage [🔝](#-contents)
 
 1. **Run Django migrations:**
 
@@ -133,11 +133,11 @@ git clone https://github.com/aliseyedi01/Django-Bookshelf-API.git
    - Swagger UI: [http://127.0.0.1:8000/swagger/](http://127.0.0.1:8000/swagger/)
    - ReDoc: [http://127.0.0.1:8000/redoc/](http://127.0.0.1:8000/redoc/)
 
-## 🤝 Contributing
+## 🤝 Contributing [🔝](#-contents)
 
 Feel free to contribute to the project. Fork the repository, make changes, and submit a pull request.
 
-## 📝 License
+## 📝 License [🔝](#-contents)
 
 This project is licensed under the [MIT License](LICENSE).
 
