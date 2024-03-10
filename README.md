@@ -7,7 +7,7 @@ A Bookshelf API implemented with Django and FastAPI
 - [Bookshelf API with Django \& DRF](#bookshelf-api-with-django--drf)
   - [📚 Contents](#-contents)
   - [📚 Demo](#-demo)
-  - [✨ Features](#-features)
+  - [✨ Features 🔝](#-features-)
   - [🔧 Technologies Used](#-technologies-used)
   - [🚀 API Endpoints](#-api-endpoints)
   - [🗃️ Database](#️-database)
@@ -30,7 +30,7 @@ A Bookshelf API implemented with Django and FastAPI
 - **Database**
 	- [dbdiagram](https://dbdiagram.io/d/library-65e177d0cd45b569fb458e75)
 
-## ✨ Features
+## ✨ Features [🔝](#-contents)
 
 - **Book Endpoints:**
 	- Comprehensive CRUD operations for managing book details, covering creation, retrieval, updating, and deletion.
