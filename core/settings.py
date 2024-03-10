@@ -193,21 +193,19 @@ SIMPLE_JWT = {
 
 AUTH_USER_MODEL = "authentication.User"
 
-
 SPECTACULAR_SETTINGS = {
-    'TITLE': '📚 Book Library API',
-    'DESCRIPTION': "**Book Library API (v1): CRUD, search, filter, integrate. \n By: @aliseyedi01** 💻",
+    'TITLE': '📚 Bookshelf API',
+    'DESCRIPTION': "Bookshelf API (v1): Manage your virtual bookshelf with CRUD operations, search, filtering, and seamless integration. \n Created by: @aliseyedi01 💻",
     'VERSION': 'v1.0.0',
     'SERVE_INCLUDE_SCHEMA': True,
-    'CONTACT': {'name': "My Github", 'url': "https://github.com/aliseyedi01"},
+    'CONTACT': {'name': "My GitHub Profile", 'url': "https://github.com/aliseyedi01"},
     'LICENSE': {'name': "BSD License"},
     "COMPONENT_SPLIT_REQUEST": True,
     'TAGS': [
-        {'name': 'auth'},
+        {'name': 'authentication'},
         {'name': 'token'}
     ],
 }
-
 
 # OTP
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
