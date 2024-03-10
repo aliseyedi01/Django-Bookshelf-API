@@ -19,8 +19,9 @@ A Bookshelf API implemented with Django and FastAPI
 
 ## 📚 Demo  [🔝](#-contents)
 
+> [!TIP]
+>  The Render.com free plan may experience a short delay (approximately 1 minute) when starting up. Please be patient for the initial access.
 
-> **Tip:** The Render.com free plan may experience a short delay (approximately 1 minute) when starting up. Please be patient for the initial access.
 
 - **Render.com**
 	- [Swagger](https://library-api-t70g.onrender.com/swagger/)
