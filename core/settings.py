@@ -16,8 +16,6 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = True
 
 
-
-
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -136,7 +134,6 @@ DATABASES = {
 }
 
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -203,11 +200,11 @@ SPECTACULAR_SETTINGS = {
     'VERSION': 'v1.0.0',
     'SERVE_INCLUDE_SCHEMA': True,
     'CONTACT': {'name': "My Github", 'url': "https://github.com/aliseyedi01"},
-    'LICENSE': { 'name' :"BSD License"},
+    'LICENSE': {'name': "BSD License"},
     "COMPONENT_SPLIT_REQUEST": True,
     'TAGS': [
-        {'name': 'auth', 'description': 'Authentication-related endpoints'},
-        {'name': 'token', 'description': 'Token-related endpoints'},
+        {'name': 'auth'},
+        {'name': 'token'}
     ],
 }
 
