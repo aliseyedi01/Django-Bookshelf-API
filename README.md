@@ -12,6 +12,7 @@ A Bookshelf API implemented with Django and FastAPI
   - [🚀 API Endpoints](#-api-endpoints)
   - [🗃️ Database](#️-database)
   - [🛠️ Installation](#️-installation)
+  - [🔐 Environments](#-environments)
   - [🖥️ Usage](#️-usage)
   - [🤝 Contributing](#-contributing)
   - [📝 License](#-license)
@@ -25,7 +26,7 @@ A Bookshelf API implemented with Django and FastAPI
 
 - **Render.com**
 	- [Swagger](https://library-api-t70g.onrender.com/swagger/)
-		- [ReDoc](https://library-api-t70g.onrender.com/redoc/)
+	- [ReDoc](https://library-api-t70g.onrender.com/redoc/)
 - **Online Code**
 	- [Github1s](https://github1s.com/aliseyedi01/Library_Api)
 - **Database**
@@ -111,6 +112,31 @@ git clone https://github.com/aliseyedi01/Django-Bookshelf-API.git
    ```bash
    pip install -r requirements.txt
    ```
+
+
+## 🔐 Environments
+
+The following are the essential environment variables required to configure the application:
+
+```bash
+SECRET_KEY
+DJANGO_DB_ENGINE
+DJANGO_DB_NAME
+DJANGO_DB_USER
+DJANGO_DB_PASSWORD
+DJANGO_DB_HOST
+DJANGO_DB_PORT
+EMAIL_BACKEND
+EMAIL_HOST
+EMAIL_PORT
+EMAIL_USER
+EMAIL_PASSWORD
+EMAIL_USE_TLS
+EMAIL_USE_SSL
+SUPABASE_URL
+SUPABASE_KEY
+```
+
 
 ## 🖥️ Usage
 
