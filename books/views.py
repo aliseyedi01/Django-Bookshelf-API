@@ -27,27 +27,27 @@ class BookListView(APIView):
             OpenApiParameter(
                 name='is_read',
                 required=False,
-                description='Use "true" to retrieve read books(/books/?is_read=true)',
+                description='Use "true" to retrieve read books(/book/?is_read=true)',
                 type=bool,
                 enum=['true', 'false']
             ),
             OpenApiParameter(
                 name='is_favorite',
                 required=False,
-                description='Use "true" to retrieve favorite books (/books/?is_favorite=true)',
+                description='Use "true" to retrieve favorite books (/book/?is_favorite=true)',
                 type=bool,
                 enum=['true', 'false']
             ),
             OpenApiParameter(
                 name='title',
                 required=False,
-                description='Search books by book title (/books/?title=sport).',
+                description='Search books by book title (/book/?title=sport).',
                 type=str,
             ),
             OpenApiParameter(
                 name='category',
                 required=False,
-                description='Filter books by category name (/books/?category=romance).',
+                description='Filter books by category name (/book/?category=romance).',
                 type=str,
             )
         ],
