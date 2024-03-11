@@ -18,31 +18,31 @@ from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny , IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken , TokenError
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken, TokenError
 # apps
-from .serializers import SingUpSerializer , ResendOtpSerializer , SingInSerializer , VerifyEmailSerializer , RefreshTokenSerializer
-from .models import User , OtpToken
+from .serializers import SingUpSerializer, ResendOtpSerializer, SingInSerializer, VerifyEmailSerializer, RefreshTokenSerializer
+from .models import User, OtpToken
 from .tokens import get_tokens_for_user
-from .utils import generate_and_send_otp , SwaggerResponse
+from .utils import generate_and_send_otp, SwaggerResponse
 from datetime import datetime, timedelta
 # swagger
-from drf_spectacular.utils import extend_schema , OpenApiExample , OpenApiResponse , OpenApiParameter
-from rest_framework_simplejwt.views import TokenRefreshView ,TokenVerifyView
-
+from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiResponse, OpenApiParameter
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 
 class SignUpView(APIView):
     permission_classes = [AllowAny]
+
     @extend_schema(
         request=SingUpSerializer,
         summary="Sing Up User",
         tags=["auth"],
         responses={
-            201 : SwaggerResponse.CREATED,
-            400 : SwaggerResponse.BAD_REQUEST
+            201: SwaggerResponse.CREATED,
+            400: SwaggerResponse.BAD_REQUEST
         }
-        )
+    )
     def post(self, request):
         serializer = SingUpSerializer(data=request.data)
         if serializer.is_valid():
@@ -56,11 +56,10 @@ class SignUpView(APIView):
             cache.set(cache_key, user_data, timeout=900)
 
             OtpToken.objects.filter(username=username).delete()
-            otp = generate_and_send_otp(user_data)
+            generate_and_send_otp(user_data)
             return Response({
-                'Message': 'Account created successfully! An OTP has been sent to your email for verification',
-                'data': { 'otp_test' :  otp.otp_code}
-                },status=status.HTTP_201_CREATED)
+                'Message': 'Account created successfully! An OTP has been sent to your email for verification'
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -69,11 +68,11 @@ class VerifyEmailView(APIView):
         request=VerifyEmailSerializer,
         summary="Check OTP",
         tags=["auth"],
-        responses= {
-            200 : SwaggerResponse.SUCCESS,
-            400 : SwaggerResponse.BAD_REQUEST,
-            401 : SwaggerResponse.UNAUTHORIZED,
-            404 : SwaggerResponse.NOT_FOUND
+        responses={
+            200: SwaggerResponse.SUCCESS,
+            400: SwaggerResponse.BAD_REQUEST,
+            401: SwaggerResponse.UNAUTHORIZED,
+            404: SwaggerResponse.NOT_FOUND
         }
     )
     def post(self, request):
@@ -107,7 +106,7 @@ class VerifyEmailView(APIView):
 
             return Response({
                 'message': 'Your account has been activated successfully!'
-                }, status=status.HTTP_200_OK)
+            }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -118,10 +117,10 @@ class ResendOtpView(APIView):
         summary="Resend New OTP",
         tags=["auth"],
         responses={
-            200 : SwaggerResponse.SUCCESS,
-            400 : SwaggerResponse.BAD_REQUEST,
-            404 : SwaggerResponse.NOT_FOUND,
-            500 : SwaggerResponse.INTERNAL_SERVER_ERROR
+            200: SwaggerResponse.SUCCESS,
+            400: SwaggerResponse.BAD_REQUEST,
+            404: SwaggerResponse.NOT_FOUND,
+            500: SwaggerResponse.INTERNAL_SERVER_ERROR
         }
     )
     def post(self, request):
@@ -135,20 +134,18 @@ class ResendOtpView(APIView):
         if not cached_data:
             return Response({
                 'error': 'Cached data not found'
-                }, status=status.HTTP_400_BAD_REQUEST)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             OtpToken.objects.filter(username=username).delete()
-            otp = generate_and_send_otp(cached_data)
+            generate_and_send_otp(cached_data)
             return Response({
-                'Message': 'A new OTP has been sent to your email address',
-                'data': { 'otp_test' :  otp.otp_code}
-                }, status=status.HTTP_200_OK)
+                'Message': 'A new OTP has been sent to your email address'
+            }, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'error': f'User with this username : {username} Not Found!'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': f"Email sending failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 class SignInView(APIView):
@@ -176,12 +173,12 @@ class SignInView(APIView):
             if not user or not user.check_password(password):
                 return Response({
                     'error': 'Invalid credentials'
-                    }, status=status.HTTP_401_UNAUTHORIZED)
+                }, status=status.HTTP_401_UNAUTHORIZED)
 
             if not user.is_verified:
                 return Response({
                     'error': 'Please verify your email address before signing in.'
-                    }, status=status.HTTP_403_FORBIDDEN)
+                }, status=status.HTTP_403_FORBIDDEN)
 
             tokens = get_tokens_for_user(user)
 
@@ -196,7 +193,7 @@ class SignInView(APIView):
             response.set_cookie(
                 'access_token',
                 value=tokens['access_token'],
-                expires=access_token_expire ,
+                expires=access_token_expire,
                 secure=True,
                 samesite='Lax',
                 domain='.library-api-t70g.onrender.com',
@@ -206,7 +203,7 @@ class SignInView(APIView):
             response.set_cookie(
                 'refresh_token',
                 value=tokens['refresh_token'],
-                expires=refresh_token_expire ,
+                expires=refresh_token_expire,
                 secure=True,
                 samesite='Lax',
                 domain='.library-api-t70g.onrender.com',
@@ -218,17 +215,17 @@ class SignInView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class SignOutView(APIView):
     permission_classes = [IsAuthenticated]
+
     @extend_schema(
         request=RefreshTokenSerializer,
         summary="Sign Out User",
         tags=["auth"],
         responses={
-            200 : SwaggerResponse.SUCCESS,
-            400 : SwaggerResponse.BAD_REQUEST,
-            500 : SwaggerResponse.INTERNAL_SERVER_ERROR
+            200: SwaggerResponse.SUCCESS,
+            400: SwaggerResponse.BAD_REQUEST,
+            500: SwaggerResponse.INTERNAL_SERVER_ERROR
         }
     )
     def post(self, request):
@@ -241,11 +238,11 @@ class SignOutView(APIView):
 
                 return Response({
                     'message': 'Successfully signed out'
-                    }, status=status.HTTP_200_OK)
+                }, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({
                     'error': f"Failed to sign out: {str(e)}"
-                    }, status=status.HTTP_400_BAD_REQUEST)
+                }, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -256,8 +253,8 @@ class MyTokenRefreshView(APIView):
         summary="Get New Access Token",
         tags=["token"],
         responses={
-            200 : SwaggerResponse.SUCCESS,
-            400 : SwaggerResponse.BAD_REQUEST,
+            200: SwaggerResponse.SUCCESS,
+            400: SwaggerResponse.BAD_REQUEST,
         },
         request=RefreshTokenSerializer,
     )
@@ -265,7 +262,7 @@ class MyTokenRefreshView(APIView):
         refresh_token = request.COOKIES.get("refresh_token") or request.data.get("refresh_token")
 
         if refresh_token is None:
-             return Response({"error": "Refresh token not found"}, status=400)
+            return Response({"error": "Refresh token not found"}, status=400)
 
         try:
             refresh_token_obj = RefreshToken(refresh_token)
@@ -284,13 +281,11 @@ class MyTokenRefreshView(APIView):
         }, status=200)
 
 
-
-
 class MyTokenVerifyView(TokenVerifyView):
     @extend_schema(
         tags=["token"],
         summary="Check Access Token",
-        )
+    )
     def post(self, *args, **kwargs):
         return super().post(*args, **kwargs)
 

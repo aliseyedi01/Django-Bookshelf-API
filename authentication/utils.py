@@ -6,13 +6,15 @@ from drf_spectacular.utils import OpenApiResponse
 
 def generate_and_send_otp(user):
     username = user['username']
+    first_name = user['first_name']
     email = user['email']
     otp = OtpToken.objects.create(username=username, expires_at=timezone.now() +
                                   timezone.timedelta(seconds=90))
     message = f"""
-        Hi {username}, here is your OTP {otp.otp_code}
-        It expires in 5 minutes, use the URL below to redirect back to the website
-        https://library-api-t70g.onrender.com/verify-email/{username}
+        Hi {first_name} 🖐️
+        Here is your One-Time Password (OTP) : {otp.otp_code}
+        It expires in 90 seconds
+        Please use this OTP to verify your Email
     """
     try:
         send_mail(
