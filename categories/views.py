@@ -118,7 +118,9 @@ class CategoryDetailView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        category_data = CategorySerializer(category).data
         category.delete()
         return Response({
-            "message":  "Category deleted successfully"},
-            status=status.HTTP_204_NO_CONTENT)
+            "message":  "Category deleted successfully",
+            "data": category_data
+        }, status=status.HTTP_200_OK)
