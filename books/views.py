@@ -196,5 +196,5 @@ class BookDetailView(APIView):
         return Response({
             "message": "Book deleted successfully",
             "data": book_data},
-            status=status.HTTP_204_NO_CONTENT
+            status=status.HTTP_200_OK
         )
