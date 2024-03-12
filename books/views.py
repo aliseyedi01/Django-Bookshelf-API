@@ -55,18 +55,18 @@ class BookListView(APIView):
     )
     def get(self, request):
         user = request.user
-        is_read = request.query_params.get('is_read', 'false').lower() == 'true'
-        is_favorite = request.query_params.get('is_favorite', 'false').lower() == 'true'
+        is_read = request.query_params.get('is_read', None)
+        is_favorite = request.query_params.get('is_favorite', None)
         title = request.query_params.get('title', None)
         category_name = request.query_params.get('category', None)
 
         queryset = Book.objects.filter(user=user)
 
-        if is_read is not False:
-            queryset = queryset.filter(is_read=is_read)
+        if is_read is not None:
+            queryset = queryset.filter(is_read=is_read.lower() == 'true')
 
-        if is_favorite is not False:
-            queryset = queryset.filter(is_favorite=is_favorite)
+        if is_favorite is not None:
+            queryset = queryset.filter(is_favorite=is_favorite.lower() == 'true')
 
         if title:
             queryset = queryset.filter(title__icontains=title)
