@@ -76,8 +76,10 @@ class MyProfileView(APIView):
 
         try:
             user = User.objects.get(username=username)
+            user.books.all().delete()
+            user.categories.all().delete()
+            user.delete()
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        user.delete()
         return Response({"message": "User profile deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
