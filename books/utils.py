@@ -14,11 +14,10 @@ supabase: Client = create_client(url, key)
 
 def upload_to_supabase(image, username, title):
     try:
-        # filename = re.sub(r'\s+', '-', f"{username}-{title}-{image.name}")
 
         unique_id = uuid.uuid4().hex[:5]
 
-        filename = re.sub(r'[^a-zA-Z0-9_.-]', '', f"{username}-{title}-{image.name}-{unique_id}")
+        filename = re.sub(r'[^a-zA-Z0-9_.-]', '', f"{username}-{title}-{unique_id}-{image.name}")
 
         file_content = image.read()
 
