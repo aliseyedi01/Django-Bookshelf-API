@@ -190,9 +190,11 @@ class BookDetailView(APIView):
         if not book:
             raise NotFound({'error': f"Book with ID: {pk} not found for current user"})
 
+        book_data = BookSerializer(book).data
         book.delete()
 
-        return Response(
-            {"message": "Book deleted successfully"},
+        return Response({
+            "message": "Book deleted successfully",
+            "data": book_data},
             status=status.HTTP_204_NO_CONTENT
         )
