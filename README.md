@@ -55,8 +55,6 @@ A Bookshelf API implemented with Django and FastAPI
 	- A powerful open-source relational database management system used for data storage.
 - **JWT Authentication:** 
 	- Implementing JSON Web Token authentication for secure user authentication.
-- **Pydantic:** 
-	- A data validation and settings management library for Python, often used with FastAPI.
 - **Gunicorn:** 
 	- A Python WSGI HTTP server for UNIX, used for deploying Django applications in production.
 - **Django ORM:** 
