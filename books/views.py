@@ -1,5 +1,6 @@
 # django
 from django.shortcuts import render
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # drf
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -49,6 +50,18 @@ class BookListView(APIView):
                 required=False,
                 description='Filter books by category name (/book/?category=romance).',
                 type=str,
+            ),
+            OpenApiParameter(
+                name='page',
+                required=False,
+                description='Page number for pagination (/book/?page=1).',
+                type=int,
+            ),
+            OpenApiParameter(
+                name='limit',
+                required=False,
+                description='Number of items per page (/book/?limit=10).',
+                type=int,
             )
         ],
         description="Use query parameters to filter the books. Both parameters are optional. If only one is provided, it will filter based on that criterion only."
@@ -59,6 +72,8 @@ class BookListView(APIView):
         is_favorite = request.query_params.get('is_favorite', None)
         title = request.query_params.get('title', None)
         category_name = request.query_params.get('category', None)
+        page_number = request.query_params.get('page', 1)
+        limit_page = request.query_params.get('limit', 10)
 
         queryset = Book.objects.filter(user=user)
 
@@ -74,7 +89,16 @@ class BookListView(APIView):
         if category_name is not None:
             queryset = queryset.filter(category=category_name)
 
-        serializer = BookSerializer(queryset, many=True)
+        paginator = Paginator(queryset, int(limit_page))
+
+        try:
+            paginated_queryset = paginator.page(page_number)
+        except PageNotAnInteger:
+            paginated_queryset = paginator.page(1)
+        except EmptyPage:
+            paginated_queryset = paginator.page(paginator.num_pages)
+
+        serializer = BookSerializer(paginated_queryset, many=True)
 
         return Response(
             {
