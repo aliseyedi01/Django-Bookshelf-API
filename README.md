@@ -1,6 +1,6 @@
 # Bookshelf API with Django & DRF
 
-A Bookshelf API implemented with Django and FastAPI
+A Bookshelf API implemented with Django and DRF
 
 ## 📚 Contents
 
